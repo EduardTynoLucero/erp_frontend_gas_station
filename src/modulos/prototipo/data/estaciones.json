@@ -1,0 +1,29 @@
+[
+  {
+    "id": "E1",
+    "codigo": "PCONC",
+    "nombre": "Gasolinera Concepción Las Minas",
+    "direccion": "Km 212 carretera a San Jerónimo, Aldea Las Guacamayas",
+    "gerenteId": "U3",
+    "unidades": [
+      "COMB",
+      "TIENDA",
+      "LUB",
+      "ADMIN"
+    ],
+    "demo": false,
+    "activa": true
+  },
+  {
+    "id": "OFC",
+    "codigo": "OFC",
+    "nombre": "Oficina central",
+    "direccion": "Administración de la franquicia",
+    "gerenteId": "U1",
+    "unidades": [
+      "ADMIN"
+    ],
+    "demo": false,
+    "activa": true
+  }
+]

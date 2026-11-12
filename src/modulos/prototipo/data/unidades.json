@@ -1,0 +1,22 @@
+[
+  {
+    "id": "COMB",
+    "nombre": "Combustible"
+  },
+  {
+    "id": "TIENDA",
+    "nombre": "Tienda de conveniencia"
+  },
+  {
+    "id": "LUB",
+    "nombre": "Lubricantes"
+  },
+  {
+    "id": "LAVADO",
+    "nombre": "Lavado de vehículos"
+  },
+  {
+    "id": "ADMIN",
+    "nombre": "Administración"
+  }
+]

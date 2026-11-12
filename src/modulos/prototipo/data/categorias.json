@@ -1,0 +1,132 @@
+[
+  {
+    "id": "ADM",
+    "nombre": "Gastos administrativos",
+    "descripcion": "Papelería, telefonía, internet, suministros y oficinas.",
+    "cuentaContable": "6101",
+    "subcategorias": [
+      "Papelería",
+      "Telefonía",
+      "Internet",
+      "Suministros de oficina",
+      "Software y licencias",
+      "Honorarios profesionales"
+    ],
+    "activa": true
+  },
+  {
+    "id": "SP",
+    "nombre": "Servicios públicos",
+    "descripcion": "Electricidad, agua, recolección de residuos y otros servicios.",
+    "cuentaContable": "6102",
+    "subcategorias": [
+      "Energía eléctrica",
+      "Agua",
+      "Recolección de residuos"
+    ],
+    "activa": true
+  },
+  {
+    "id": "MNT",
+    "nombre": "Mantenimiento",
+    "descripcion": "Bombas, dispensadores, tanques, instalaciones, equipos y mobiliario.",
+    "cuentaContable": "6103",
+    "subcategorias": [
+      "Bombas y dispensadores",
+      "Calibración",
+      "Tanques",
+      "Instalaciones",
+      "Equipo y mobiliario"
+    ],
+    "activa": true
+  },
+  {
+    "id": "PER",
+    "nombre": "Personal",
+    "descripcion": "Viáticos, uniformes, capacitaciones y gastos asociados al personal.",
+    "cuentaContable": "6104",
+    "subcategorias": [
+      "Viáticos",
+      "Uniformes",
+      "Capacitación",
+      "Alimentación"
+    ],
+    "activa": true
+  },
+  {
+    "id": "SEG",
+    "nombre": "Seguridad",
+    "descripcion": "Vigilancia, alarmas, cámaras y servicios de monitoreo.",
+    "cuentaContable": "6105",
+    "subcategorias": [
+      "Vigilancia",
+      "Alarmas y monitoreo",
+      "Cámaras"
+    ],
+    "activa": true
+  },
+  {
+    "id": "TRA",
+    "nombre": "Transporte",
+    "descripcion": "Combustible de vehículos internos, mensajería, transporte y logística.",
+    "cuentaContable": "6106",
+    "subcategorias": [
+      "Combustible vehículos internos",
+      "Mensajería",
+      "Fletes"
+    ],
+    "activa": true
+  },
+  {
+    "id": "COM",
+    "nombre": "Gastos comerciales",
+    "descripcion": "Publicidad, promociones, imagen de marca y mercadeo.",
+    "cuentaContable": "6107",
+    "subcategorias": [
+      "Publicidad",
+      "Promociones",
+      "Descuentos a clientes",
+      "Imagen de marca"
+    ],
+    "activa": true
+  },
+  {
+    "id": "FIN",
+    "nombre": "Gastos financieros",
+    "descripcion": "Comisiones bancarias, intereses, seguros y otros cargos.",
+    "cuentaContable": "6108",
+    "subcategorias": [
+      "Comisiones por tarjeta",
+      "Comisiones bancarias",
+      "Intereses",
+      "Seguros"
+    ],
+    "activa": true
+  },
+  {
+    "id": "FRQ",
+    "nombre": "Gastos de franquicia",
+    "descripcion": "Regalías, licencias, cuotas y contribuciones comerciales.",
+    "cuentaContable": "6109",
+    "subcategorias": [
+      "Regalías",
+      "Cuota de imagen",
+      "Licencias"
+    ],
+    "activa": true
+  },
+  {
+    "id": "EXT",
+    "nombre": "Gastos extraordinarios",
+    "descripcion": "Reparaciones imprevistas, emergencias y gastos no recurrentes.",
+    "cuentaContable": "6110",
+    "subcategorias": [
+      "Reparaciones imprevistas",
+      "Emergencias",
+      "Merma de combustible",
+      "Venta bajo costo",
+      "Faltantes de caja"
+    ],
+    "activa": true
+  }
+]

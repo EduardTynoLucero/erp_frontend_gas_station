@@ -1,0 +1,87 @@
+[
+  {
+    "id": "U0",
+    "nombre": "Administrador del sistema",
+    "usuario": "admin",
+    "rolId": "SA",
+    "estaciones": [
+      "E1",
+      "OFC"
+    ],
+    "activo": true
+  },
+  {
+    "id": "U1",
+    "nombre": "Ana Morales",
+    "usuario": "ana.morales",
+    "rolId": "GG",
+    "estaciones": [
+      "E1",
+      "OFC"
+    ],
+    "activo": true
+  },
+  {
+    "id": "U2",
+    "nombre": "Luis Pérez",
+    "usuario": "luis.perez",
+    "rolId": "CC",
+    "estaciones": [
+      "E1",
+      "OFC"
+    ],
+    "activo": true
+  },
+  {
+    "id": "U8",
+    "nombre": "Carmen Ruiz",
+    "usuario": "carmen.ruiz",
+    "rolId": "TE",
+    "estaciones": [
+      "E1",
+      "OFC"
+    ],
+    "activo": true
+  },
+  {
+    "id": "U3",
+    "nombre": "Karla Méndez",
+    "usuario": "karla.mendez",
+    "rolId": "GE",
+    "estaciones": [
+      "E1"
+    ],
+    "activo": true
+  },
+  {
+    "id": "U6",
+    "nombre": "María López",
+    "usuario": "maria.lopez",
+    "rolId": "CA",
+    "estaciones": [
+      "E1"
+    ],
+    "activo": true
+  },
+  {
+    "id": "U9",
+    "nombre": "Pedro Gómez",
+    "usuario": "pedro.gomez",
+    "rolId": "SO",
+    "estaciones": [
+      "E1"
+    ],
+    "activo": true
+  },
+  {
+    "id": "U7",
+    "nombre": "Jorge Herrera",
+    "usuario": "jorge.herrera",
+    "rolId": "AU",
+    "estaciones": [
+      "E1",
+      "OFC"
+    ],
+    "activo": true
+  }
+]

@@ -1,0 +1,348 @@
+@import "tailwindcss";
+
+/* Modo oscuro por clase (next-themes pone `dark` en <html>): las clases dark: de Tailwind se activan con ella. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Plantilla visual del ERP: la estructura de Digital Labs (plana y compacta) con la identidad de Puma Energy.
+ *   - Rojo Puma #E30613 (al pasar el ratón #C20510) para lo principal: botones, menú activo, bordes destacados e
+ *     indicadores clave. Verde Puma #007A3D (#005C2E, y #008F47 en oscuro) para lo secundario: aprobado, completado,
+ *     indicadores positivos. Blanco puro y gris pizarra para fondos, bordes y texto.
+ *   - Radios de 2 px, sin sombras en las tarjetas ni degradados.
+ *   - Letra Inter de 13 px, tablas delgadas de 10.5 px y controles de 30 px de alto.
+ * Todo el frontend usa las clases de Tailwind `brand-*` (rojo), `emerald-*` (verde) y `slate-*` (pizarra): aquí se
+ * redefinen, así que cambiar la paleta es cambiar este archivo.
+ */
+@theme {
+  /* Rojo Puma: 500 el principal, 600 al pasar el ratón, 700 el oscuro (texto), 50 y 100 los fondos suaves */
+  --color-brand-50: #fef2f2;
+  --color-brand-100: #fee2e2;
+  --color-brand-200: #fecaca;
+  --color-brand-300: #fca5a5;
+  --color-brand-400: #f87171;
+  --color-brand-500: #e30613;
+  --color-brand-600: #c20510;
+  --color-brand-700: #a1040e;
+  --color-brand-800: #7f0a10;
+  --color-brand-900: #5f0b0f;
+  --color-brand-950: #450a0a;
+
+  /* Verde Puma: 600 el principal, 700 el oscuro, 500 el de modo oscuro, 50 el fondo suave. 300 y 400 son el texto
+     verde sobre fondo oscuro */
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d3f5e3;
+  --color-emerald-200: #a8e6c4;
+  --color-emerald-300: #6fd49a;
+  --color-emerald-400: #2fb36b;
+  --color-emerald-500: #008f47;
+  --color-emerald-600: #007a3d;
+  --color-emerald-700: #005c2e;
+  --color-emerald-800: #004a25;
+  --color-emerald-900: #003b1e;
+  --color-emerald-950: #002313;
+
+  /* Gris pizarra: 50 el fondo de la página, 100 el fondo suave, 200 el borde, 300 el borde de los campos, 400 el
+     texto de ayuda dentro de un campo, 500 el texto tenue, 600 a 900 el texto. En el modo oscuro, 900 son las
+     tarjetas (#1A1F24) y 950 el fondo (#111417) */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #343c46;
+  --color-slate-800: #252b32;
+  --color-slate-900: #1a1f24;
+  --color-slate-950: #111417;
+
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Letra compacta: el cuerpo es de 12 a 13 px y el texto secundario de 11 px */
+  --text-xs: 0.6875rem;
+  --text-xs--line-height: 1.35;
+  --text-sm: 0.75rem;
+  --text-sm--line-height: 1.4;
+  --text-base: 0.8125rem;
+  --text-base--line-height: 1.4;
+  --text-lg: 0.9375rem;
+  --text-lg--line-height: 1.3;
+  --text-xl: 1.125rem;
+  --text-xl--line-height: 1.25;
+  --text-2xl: 1.25rem;
+  --text-2xl--line-height: 1.2;
+  --text-3xl: 1.5rem;
+  --text-3xl--line-height: 1.2;
+
+  /* Unidad de espacio de 3 px (la de Tailwind es 4): p-4 son 12 px y gap-2 son 6 px, como en la plantilla */
+  --spacing: 0.1875rem;
+
+  /* Esquinas casi rectas */
+  --radius: 2px;
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius-4xl: 6px;
+
+  /* Plano: las tarjetas no llevan sombra. Solo lo que flota (menús, avisos) y los modales */
+  --shadow: 0 0 #0000;
+  --shadow-2xs: 0 0 #0000;
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+  --shadow-md: 0 2px 6px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 3px 8px rgb(0 0 0 / 0.16);
+  --shadow-xl: 0 18px 40px rgb(15 23 42 / 0.18);
+  --shadow-2xl: 0 18px 40px rgb(15 23 42 / 0.18);
+
+  --animate-barra: barra 1.2s ease-in-out infinite;
+  @keyframes barra {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
+  }
+
+  /* Aparecer de las gráficas del dashboard (250 ms, como el panel del ETL) */
+  --animate-aparecer: aparecer 250ms ease-out;
+  @keyframes aparecer {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+/* Colores con nombre de la plantilla: cambian solos con el tema (no necesitan la variante dark:) */
+@theme inline {
+  --color-fondo: var(--ui-bg);
+  --color-superficie: var(--ui-surface);
+  --color-superficie-suave: var(--ui-surface-soft);
+  --color-barra: var(--ui-toolbar);
+  --color-realce: var(--ui-hover);
+  --color-cabecera: var(--ui-header);
+  --color-franja: var(--ui-row-alt);
+  --color-borde: var(--ui-border);
+  --color-borde-suave: var(--ui-border-soft);
+  --color-borde-campo: var(--ui-input-border);
+  --color-tinta: var(--ui-text);
+  --color-tinta-suave: var(--ui-text-soft);
+  --color-tenue: var(--ui-muted);
+  --color-apagado: var(--ui-off-soft);
+  --color-primario: var(--ui-primary);
+  --color-primario-fuerte: var(--ui-primary-hover);
+  --color-primario-tinta: var(--ui-primary-dark);
+  --color-primario-suave: var(--ui-primary-soft);
+  --color-primario-suave-2: var(--ui-primary-soft-2);
+}
+
+:root {
+  /* Tokens de la plantilla en modo claro: blanco puro en las tarjetas y gris muy limpio (#F8FAFC) de fondo */
+  --ui-primary: #e30613;
+  --ui-primary-hover: #c20510;
+  --ui-primary-dark: #c20510;
+  --ui-primary-soft: #fef2f2;
+  --ui-primary-soft-2: #fee2e2;
+  --ui-bg: #f8fafc;
+  --ui-surface: #ffffff;
+  --ui-surface-soft: #f8fafc;
+  --ui-toolbar: #f1f5f9;
+  --ui-hover: #fef2f2;
+  --ui-header: #f4f6f9;
+  --ui-row-alt: #fafbfc;
+  --ui-text: #1a1f24;
+  --ui-text-soft: #475569;
+  --ui-muted: #64748b;
+  --ui-border: #e2e8f0;
+  --ui-border-soft: #edf1f5;
+  --ui-input-border: #cbd5e1;
+  --ui-off-soft: #f1f5f9;
+
+  /* Colores de las gráficas del dashboard. El color de cada producto es fijo por nombre y no cambia con la paleta:
+     DIESEL --s1, REGULAR --s2, SUPER --s3, productos nuevos --s5 y --s6, SIN PRODUCTO gris. --acento es el rojo
+     Puma, para las gráficas de una sola serie que no son de un producto. En la cascada de inventario, las compras
+     van en verde (--s6), las ventas en rojo (--s8) y el ajuste por toma física en pizarra (--s4) */
+  --acento: #e30613;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #64748b;
+  --s5: #334155;
+  --s6: #007a3d;
+  --s7: #475569;
+  --s8: #e30613;
+  --s-otro: #8a96a3;
+  /* Escala secuencial del mapa de calor (de 0 al máximo), en rojo Puma */
+  --sec-1: #fef2f2;
+  --sec-2: #fecaca;
+  --sec-3: #f87171;
+  --sec-4: #e30613;
+  --sec-5: #7f0a10;
+  --graf-tinta: #1a1f24;
+  --graf-tinta-2: #475569;
+  --graf-ejes: #64748b;
+  --graf-rejilla: #edf1f5;
+  --graf-base: #e2e8f0;
+  --graf-superficie: #ffffff;
+
+  /* Colores de estado (íconos, veredictos y semáforo de los tanques): reservados, nunca son color de serie */
+  --estado-bueno: #007a3d;
+  --estado-aviso: #fab219;
+  --estado-critico: #e30613;
+  --estado-info: #64748b;
+}
+.dark {
+  /* Modo oscuro: fondo carbón #111417 y tarjetas #1A1F24. El rojo se mantiene; el verde sube a #008F47 */
+  --ui-primary: #e30613;
+  --ui-primary-hover: #c20510;
+  --ui-primary-dark: #f87171;
+  --ui-primary-soft: rgb(69 10 10 / 0.3);
+  --ui-primary-soft-2: rgb(127 29 29 / 0.45);
+  --ui-bg: #111417;
+  --ui-surface: #1a1f24;
+  --ui-surface-soft: #1f252b;
+  --ui-toolbar: #20262c;
+  --ui-hover: rgb(69 10 10 / 0.3);
+  --ui-header: #20262c;
+  --ui-row-alt: #1d2227;
+  --ui-text: #e6e9ec;
+  --ui-text-soft: #c3cad1;
+  --ui-muted: #94a0ab;
+  --ui-border: #2e353d;
+  --ui-border-soft: #252b32;
+  --ui-input-border: #3d4650;
+  --ui-off-soft: #22282e;
+
+  --acento: #e30613;
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s3: #199e70;
+  --s4: #94a3b8;
+  --s5: #cbd5e1;
+  --s6: #008f47;
+  --s7: #94a3b8;
+  --s8: #e30613;
+  --s-otro: #6b7785;
+  /* En oscuro la escala se invierte: el valor alto es el color más claro */
+  --sec-1: #2a1518;
+  --sec-2: #5f0b0f;
+  --sec-3: #a1040e;
+  --sec-4: #e30613;
+  --sec-5: #fca5a5;
+  --graf-tinta: #e6e9ec;
+  --graf-tinta-2: #c3cad1;
+  --graf-ejes: #94a0ab;
+  --graf-rejilla: #252b32;
+  --graf-base: #343c46;
+  --graf-superficie: #1a1f24;
+
+  --estado-bueno: #008f47;
+  --estado-aviso: #fab219;
+  --estado-critico: #e30613;
+  --estado-info: #94a3b8;
+}
+
+/*
+ * Acciones de la barra de título (EncabezadoPagina): los botones y enlaces que se le pasan quedan planos, como las
+ * acciones de la barra de pestañas de la plantilla. Va fuera de las capas para ganarles a las clases del botón.
+ */
+.barra-acciones > :is(a, button),
+.barra-acciones > span > button {
+  height: auto;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-left: 1px solid var(--ui-border-soft);
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  font-size: 12px;
+  font-weight: 600;
+  filter: none;
+}
+.barra-acciones > span {
+  display: inline-flex;
+  align-items: stretch;
+}
+.barra-acciones > :is(a, button):hover:not(:disabled),
+.barra-acciones > span > button:hover:not(:disabled) {
+  border-bottom-color: var(--ui-primary);
+  background: var(--ui-hover);
+  color: var(--ui-primary-dark);
+}
+/* La acción principal de la pantalla («+ Nuevo…») se distingue por el texto rojo */
+.barra-acciones > :is(a, button)[class~='bg-primario'] {
+  color: var(--ui-primary-dark);
+}
+/* Lo que no es un botón (un selector de mes, una etiqueta) va centrado con un margen pequeño */
+.barra-acciones > :not(a, button, span) {
+  align-self: center;
+  margin: 3px 6px;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    background: var(--ui-bg);
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-fondo font-sans text-tinta antialiased;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  /* Casillas y botones de opción en el rojo de la marca */
+  input[type='checkbox'],
+  input[type='radio'] {
+    accent-color: var(--ui-primary);
+  }
+  ::selection {
+    background: var(--ui-primary-soft-2);
+  }
+  /* Barras de desplazamiento delgadas, como en la plantilla */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+  .dark * {
+    scrollbar-color: #3d4650 transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #3d4650;
+  }
+  /* Transición suave al cambiar de tema (la animación cruzada la da la View Transitions API) */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 280ms;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
+  }
+  /* Los campos de fecha siguen el tema */
+  input[type='date']::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+  }
+  .dark input[type='date']::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}

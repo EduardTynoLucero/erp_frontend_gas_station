@@ -1,0 +1,38 @@
+[
+  {
+    "id": "P01",
+    "nombre": "PUMA ENERGY GUATEMALA, S.A.",
+    "nit": "6986102",
+    "tipo": "Franquicia y combustible",
+    "categoriaId": "FRQ",
+    "contacto": "Ejecutivo de cuenta",
+    "telefono": "",
+    "diasCredito": 15,
+    "activo": true,
+    "fuente": "Reporte de compras"
+  },
+  {
+    "id": "P02",
+    "nombre": "Credomatic (procesador de tarjetas)",
+    "nit": "Por definir",
+    "tipo": "Servicios financieros",
+    "categoriaId": "FIN",
+    "contacto": "",
+    "telefono": "",
+    "diasCredito": 0,
+    "activo": true,
+    "fuente": "Cierres de caja"
+  },
+  {
+    "id": "P04",
+    "nombre": "Municipalidad de Concepción Las Minas",
+    "nit": "4596889",
+    "tipo": "Servicio público",
+    "categoriaId": "SP",
+    "contacto": "Oficina de aguas",
+    "telefono": "",
+    "diasCredito": 15,
+    "activo": true,
+    "fuente": "Reporte de tickets (cliente)"
+  }
+]

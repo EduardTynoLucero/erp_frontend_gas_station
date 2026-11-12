@@ -1,0 +1,27 @@
+{
+  "niveles": [
+    {
+      "hasta": 1000,
+      "rolId": "GE",
+      "etiqueta": "Gerente de estación"
+    },
+    {
+      "hasta": 10000,
+      "rolId": "CC",
+      "etiqueta": "Contador corporativo"
+    },
+    {
+      "hasta": null,
+      "rolId": "GG",
+      "etiqueta": "Gerencia general"
+    }
+  ],
+  "comprobanteObligatorioDesde": 100,
+  "toleranciaMermaPct": 0.5,
+  "tasaComisionTarjeta": 0.035,
+  "alertaPresupuestoPct": 90,
+  "diasAlertaVencimiento": 5,
+  "diasAlertaPendiente": 3,
+  "criterioProrrateo": "ventas",
+  "limiteDesembolsoCaja": 500
+}

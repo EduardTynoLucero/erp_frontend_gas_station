@@ -1,0 +1,220 @@
+[
+  {
+    "id": "SA",
+    "nombre": "Super administrador",
+    "descripcion": "Administrador del sistema: usuarios, roles, estaciones, catálogos, parámetros e integraciones. Tiene acceso a todo.",
+    "permisos": [
+      "ver_todo",
+      "registrar",
+      "aprobar",
+      "pagar",
+      "presupuestos",
+      "catalogos",
+      "revisar",
+      "configurar",
+      "usuarios",
+      "auditar",
+      "caja_chica"
+    ],
+    "pantallas": [
+      "mis-solicitudes",
+      "tablero",
+      "alertas",
+      "hallazgos",
+      "gastos",
+      "autorizaciones",
+      "presupuestos",
+      "proveedores",
+      "catalogos",
+      "estaciones",
+      "usuarios",
+      "reportes",
+      "cuentas-por-pagar",
+      "caja-chica",
+      "compras",
+      "contratos",
+      "recurrentes",
+      "prorrateo",
+      "franquicia",
+      "indicadores",
+      "auditoria",
+      "integraciones",
+      "configuracion"
+    ],
+    "limiteAutorizacion": null,
+    "soloPropios": false
+  },
+  {
+    "id": "GG",
+    "nombre": "Gerencia general",
+    "descripcion": "Dueño o gerente de la franquicia: ve el gasto de todas las estaciones, autoriza sin límite, fija presupuestos y revisa hallazgos y bitácora. No administra el sistema.",
+    "permisos": [
+      "ver_todo",
+      "registrar",
+      "aprobar",
+      "presupuestos"
+    ],
+    "pantallas": [
+      "mis-solicitudes",
+      "tablero",
+      "alertas",
+      "hallazgos",
+      "gastos",
+      "autorizaciones",
+      "presupuestos",
+      "proveedores",
+      "reportes",
+      "cuentas-por-pagar",
+      "caja-chica",
+      "compras",
+      "contratos",
+      "recurrentes",
+      "prorrateo",
+      "franquicia",
+      "indicadores",
+      "auditoria"
+    ],
+    "limiteAutorizacion": null,
+    "soloPropios": false
+  },
+  {
+    "id": "CC",
+    "nombre": "Contador corporativo",
+    "descripcion": "Revisa comprobantes y facturas FEL, autoriza hasta Q10,000, mantiene catálogos, proveedores, presupuestos y la conexión con contabilidad.",
+    "permisos": [
+      "ver_todo",
+      "registrar",
+      "aprobar",
+      "presupuestos",
+      "catalogos",
+      "revisar"
+    ],
+    "pantallas": [
+      "mis-solicitudes",
+      "tablero",
+      "alertas",
+      "hallazgos",
+      "gastos",
+      "autorizaciones",
+      "presupuestos",
+      "proveedores",
+      "catalogos",
+      "reportes",
+      "cuentas-por-pagar",
+      "caja-chica",
+      "compras",
+      "contratos",
+      "recurrentes",
+      "prorrateo",
+      "franquicia",
+      "indicadores",
+      "integraciones"
+    ],
+    "limiteAutorizacion": 10000,
+    "soloPropios": false
+  },
+  {
+    "id": "TE",
+    "nombre": "Tesorería",
+    "descripcion": "Paga los gastos aprobados y repone las cajas chicas. Ve lo que tiene que pagar, no presupuestos ni indicadores.",
+    "permisos": [
+      "ver_todo",
+      "pagar"
+    ],
+    "pantallas": [
+      "alertas",
+      "gastos",
+      "proveedores",
+      "reportes",
+      "cuentas-por-pagar",
+      "caja-chica"
+    ],
+    "limiteAutorizacion": 0,
+    "soloPropios": false
+  },
+  {
+    "id": "GE",
+    "nombre": "Gerente de estación",
+    "descripcion": "Registra gastos y compras de su estación, autoriza hasta Q1,000 y ve el presupuesto y la caja chica de su estación.",
+    "permisos": [
+      "registrar",
+      "aprobar"
+    ],
+    "pantallas": [
+      "mis-solicitudes",
+      "tablero",
+      "alertas",
+      "gastos",
+      "autorizaciones",
+      "presupuestos",
+      "reportes",
+      "caja-chica",
+      "compras",
+      "recurrentes"
+    ],
+    "limiteAutorizacion": 1000,
+    "soloPropios": false
+  },
+  {
+    "id": "CA",
+    "nombre": "Encargado de caja chica",
+    "descripcion": "Maneja el fondo de caja chica de su estación: desembolsos y liquidación. Solo ve lo que él registra.",
+    "permisos": [
+      "registrar",
+      "caja_chica"
+    ],
+    "pantallas": [
+      "mis-solicitudes",
+      "gastos",
+      "caja-chica",
+      "compras"
+    ],
+    "limiteAutorizacion": 0,
+    "soloPropios": true
+  },
+  {
+    "id": "SO",
+    "nombre": "Solicitante",
+    "descripcion": "Registra sus propias solicitudes de gasto y requerimientos de compra; solo ve lo suyo.",
+    "permisos": [
+      "registrar"
+    ],
+    "pantallas": [
+      "mis-solicitudes",
+      "gastos",
+      "compras"
+    ],
+    "limiteAutorizacion": 0,
+    "soloPropios": true
+  },
+  {
+    "id": "AU",
+    "nombre": "Auditor",
+    "descripcion": "Revisa el gasto de todas las estaciones sin modificarlo: bitácora, hallazgos, pagos y caja chica. No ve la administración del sistema.",
+    "permisos": [
+      "ver_todo",
+      "auditar"
+    ],
+    "pantallas": [
+      "tablero",
+      "alertas",
+      "hallazgos",
+      "gastos",
+      "presupuestos",
+      "proveedores",
+      "catalogos",
+      "reportes",
+      "cuentas-por-pagar",
+      "caja-chica",
+      "compras",
+      "contratos",
+      "recurrentes",
+      "prorrateo",
+      "franquicia",
+      "indicadores",
+      "auditoria"
+    ],
+    "limiteAutorizacion": 0,
+    "soloPropios": false
+  }
+]

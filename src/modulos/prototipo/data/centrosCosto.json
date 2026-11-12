@@ -1,0 +1,42 @@
+[
+  {
+    "id": "PCONC-COMB",
+    "codigo": "PCONC-COMB",
+    "nombre": "Combustible · PCONC",
+    "estacionId": "E1",
+    "unidad": "COMB",
+    "activo": true
+  },
+  {
+    "id": "PCONC-TIENDA",
+    "codigo": "PCONC-TIENDA",
+    "nombre": "Tienda de conveniencia · PCONC",
+    "estacionId": "E1",
+    "unidad": "TIENDA",
+    "activo": true
+  },
+  {
+    "id": "PCONC-LUB",
+    "codigo": "PCONC-LUB",
+    "nombre": "Lubricantes · PCONC",
+    "estacionId": "E1",
+    "unidad": "LUB",
+    "activo": true
+  },
+  {
+    "id": "PCONC-ADMIN",
+    "codigo": "PCONC-ADMIN",
+    "nombre": "Administración · PCONC",
+    "estacionId": "E1",
+    "unidad": "ADMIN",
+    "activo": true
+  },
+  {
+    "id": "OFC-ADMIN",
+    "codigo": "OFC-ADMIN",
+    "nombre": "Administración · OFC",
+    "estacionId": "OFC",
+    "unidad": "ADMIN",
+    "activo": true
+  }
+]
