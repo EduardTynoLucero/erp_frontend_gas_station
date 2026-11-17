@@ -1,8 +1,10 @@
 # syntax=docker/dockerfile:1
 #
 # Frontend del ERP Gas Station (Next.js 16, salida standalone) para producción. Se construye solo con esta carpeta.
+# En Dokploy vive en https://gasstationerp.belsoftinc.net (puerto interno 3000).
 # La URL del backend NO se fija al compilar: se lee de API_URL al arrancar (ver src/proxy.ts), así la misma imagen
-# sirve con cualquier backend.
+# sirve con cualquier backend. En producción es https://backend-gas-station.belsoftinc.net (también es el valor por
+# defecto), nunca la dirección de este frontend.
 #
 #   docker build -t erp-frontend .
 #   docker run -e API_URL=http://erp-backend:4000 -p 3000:3000 erp-frontend

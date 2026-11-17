@@ -12,7 +12,7 @@
  */
 import { type NextRequest, NextResponse } from 'next/server';
 import { destinoSeguro } from '@/lib/rutas';
-import { urlApi } from '@/lib/servidor/constantes';
+import { cabecerasDeReenvio, urlApi } from '@/lib/servidor/constantes';
 
 const redirigir = (ruta: string) => new NextResponse(null, { status: 307, headers: { location: ruta } });
 
@@ -29,7 +29,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     respuesta = await fetch(`${backend}/api/v1/auth/refresh`, {
       method: 'POST',
-      headers: { cookie: `erp_refresco=${refresco}` },
+      // La IP real del usuario va aparte: el límite de renovaciones del backend cuenta por usuario
+      headers: { cookie: `erp_refresco=${refresco}`, ...cabecerasDeReenvio(request.headers) },
       cache: 'no-store',
     });
   } catch {

@@ -3,7 +3,9 @@
  *
  * La API (/api/v1/*, salvo las rutas propias de Next.js) se reenvía al backend de API_URL. Se hace aquí y no con
  * rewrites de next.config.ts porque esos se fijan al compilar: así API_URL se lee al arrancar el contenedor y la misma
- * imagen sirve para cualquier backend. El navegador sigue hablando solo con Next.js (mismo origen, cookies httpOnly).
+ * imagen sirve para cualquier backend. El navegador sigue hablando solo con Next.js (mismo origen, cookies httpOnly que
+ * no salen de este subdominio). En producción: https://gasstationerp.belsoftinc.net/api/v1 →
+ * https://backend-gas-station.belsoftinc.net/api/v1, con la IP real del usuario aparte (cabecerasDeReenvio).
  *
  * En cada navegación a una página del ERP:
  *   1. Lee la cookie httpOnly erp_acceso y consulta GET /api/v1/auth/me en el backend.
@@ -17,7 +19,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import type { Perfil } from '@/api/tipos';
 import { cumple, inicioDe, requisitoDe } from '@/lib/rutas';
-import { CABECERA_PERFIL, codificarPerfil, urlApi } from '@/lib/servidor/constantes';
+import { CABECERA_PERFIL, cabecerasDeReenvio, codificarPerfil, urlApi } from '@/lib/servidor/constantes';
 
 /** Rutas de /api/v1 que atiende el propio Next.js (src/app/api): no se reenvían al backend. */
 const RUTAS_PROPIAS = new Set(['/api/v1/auth/renovar']);
@@ -38,6 +40,32 @@ function esPublica(pathname: string): boolean {
   );
 }
 
+/**
+ * ¿El reenvío volvería a este mismo frontend? Pasa si API_URL tiene la dirección del frontend
+ * (https://gasstationerp.belsoftinc.net) en vez de la del backend: cada petición se reenviaría a sí misma sin fin. Se
+ * compara con el dominio que pidió el navegador (Host, o X-Forwarded-Host detrás de Traefik).
+ */
+function vuelveAEsteFrontend(destino: URL, request: NextRequest): boolean {
+  const propios = [request.headers.get('x-forwarded-host')?.split(',')[0], request.headers.get('host')];
+  return propios.some((h) => h?.trim().toLowerCase() === destino.host.toLowerCase());
+}
+
+function apiEnBucle(destino: URL): NextResponse {
+  console.error(
+    `API_URL (${destino.origin}) es la dirección de este mismo frontend: el reenvío de /api/v1 volvería a entrar aquí sin ` +
+      'fin. Pon la dirección del backend: API_URL=https://backend-gas-station.belsoftinc.net (o la interna, http://<App Name del backend>:4000).',
+  );
+  return NextResponse.json(
+    {
+      title: 'Configuración del servidor',
+      status: 508,
+      codigo: 'API_URL_EN_BUCLE',
+      detail: 'El servidor del ERP está mal configurado y no puede llegar a la API. Avise a soporte.',
+    },
+    { status: 508, headers: { 'content-type': 'application/problem+json' } },
+  );
+}
+
 function renovar(request: NextRequest, destino: string): NextResponse {
   return NextResponse.redirect(new URL(`/api/v1/auth/renovar?destino=${encodeURIComponent(destino)}`, request.url));
 }
@@ -50,7 +78,13 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname, search } = request.nextUrl;
   // La API va al backend con el cuerpo, las cookies y el Origin tal como llegaron (Set-Cookie vuelve igual)
   if (pathname.startsWith('/api/v1/') && !RUTAS_PROPIAS.has(pathname)) {
-    return NextResponse.rewrite(new URL(`${pathname}${search}`, urlApi()));
+    const destino = new URL(`${pathname}${search}`, urlApi());
+    if (vuelveAEsteFrontend(destino, request)) return apiEnBucle(destino);
+    const reenvio = cabecerasDeReenvio(request.headers);
+    if (Object.keys(reenvio).length === 0) return NextResponse.rewrite(destino);
+    const cabeceras = new Headers(request.headers);
+    for (const [nombre, valor] of Object.entries(reenvio)) cabeceras.set(nombre, valor);
+    return NextResponse.rewrite(destino, { request: { headers: cabeceras } });
   }
   if (esPublica(pathname)) return NextResponse.next();
   const destino = `${pathname}${search}`;

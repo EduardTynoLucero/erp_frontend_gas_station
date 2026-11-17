@@ -80,8 +80,12 @@ src/
 
 - **Mismo origen:** `src/proxy.ts` reenvía `/api/v1/*` (menos las rutas propias, como `/api/v1/auth/renovar`) hacia
   `API_URL`, leída en cada petición. No se usan rewrites de `next.config.ts` porque se fijan al compilar y la imagen de
-  Docker quedaría atada a un backend. El navegador solo habla con el frontend, así que las cookies httpOnly del
-  backend funcionan sin CORS, y la protección CSRF del backend (cabecera `Origin`) las acepta.
+  Docker quedaría atada a un backend. El navegador solo habla con el frontend (en producción,
+  `https://gasstationerp.belsoftinc.net`; el cliente usa rutas relativas, `/api/v1/...`), así que las cookies httpOnly
+  del backend quedan solo en este subdominio y funcionan sin CORS, y la protección CSRF del backend (cabecera `Origin`)
+  las acepta. En producción el reenvío va a `https://backend-gas-station.belsoftinc.net`, con la IP real del usuario
+  aparte (`X-Erp-Ip-Cliente` + `SECRETO_REENVIO`). El frontend no llama al ETL: lo que el ETL deja en la base lo sirve
+  el backend.
 - **Datos:** TanStack Query. Las mutaciones actualizan el detalle en caché e invalidan las listas. Los errores de la
   API llegan como `ErrorApi` (problem+json: `codigo`, `detail`, `errores[{ campo, mensaje }]`).
 - **Sesión en el navegador:** si una petición responde 401, el cliente renueva el token (`POST /auth/refresh`, una
@@ -379,13 +383,24 @@ El servicio ETL independiente y la prueba de punta a punta están en `../etl`, y
 | Dato | Valor |
 |---|---|
 | Dockerfile | `Dockerfile` (contexto `.`, etapa `production` o vacía) |
-| Puerto interno | `3000` (en Dokploy, el dominio público apunta a este puerto) |
+| Puerto interno | `3000` |
+| Dominio | `https://gasstationerp.belsoftinc.net` (en Dokploy: ese host, puerto `3000`, HTTPS) |
 | Salud | `GET /login` (también es el `HEALTHCHECK` de la imagen) |
 | Ya trae | `NODE_ENV=production`, `PORT=3000`, `HOSTNAME=0.0.0.0`, `TZ=America/Guatemala` |
 
-La única variable obligatoria es **`API_URL`**: la dirección del backend dentro de la red de Dokploy, por ejemplo
-`http://<App Name del backend>:4000`. Se lee al arrancar, no al compilar, así que no va en «Build-time Arguments». Sin
-ella, en producción el servidor responde con error y lo dice en el log.
+Variables (se leen al arrancar, no al compilar: no van en «Build-time Arguments»):
+
+- **`API_URL`:** el subdominio del backend, `https://backend-gas-station.belsoftinc.net`. Si no se pone, en producción
+  es ese mismo (`URL_BACKEND_PRODUCCION` en `src/lib/servidor/constantes.ts`); nunca `localhost`. No puede ser la
+  dirección de este frontend: el reenvío de `/api/v1` volvería a entrar aquí sin fin. `proxy.ts` lo detecta (compara el
+  destino con el dominio de la petición), responde `508` y lo anota en el log.
+- **`SECRETO_REENVIO`:** el mismo valor que en el backend. Al pasar por el subdominio del backend, Traefik reemplaza la
+  IP del usuario por la del servidor; con el secreto, el frontend se la manda aparte y el límite de inicios de sesión
+  sigue contando por usuario.
+
+Si el servidor no pudiera llegar a sus propios subdominios (raro), `API_URL` también acepta la dirección interna del
+backend en la red de Dokploy: `http://<App Name del backend>:4000`. La configuración de los tres proyectos está en
+`CONFIGURACION_DOKPLOY.txt`, en la carpeta raíz.
 
 Diferencias de la compilación de producción:
 

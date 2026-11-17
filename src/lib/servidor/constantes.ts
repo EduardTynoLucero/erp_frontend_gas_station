@@ -2,17 +2,37 @@
 import type { Perfil } from '@/api/tipos';
 
 /**
- * URL del backend (solo del lado del servidor; el navegador usa /api/v1 en el mismo origen). Se lee de API_URL en cada
- * petición, no al compilar: la misma imagen de Docker sirve para cualquier backend. Sin API_URL, en desarrollo es el
- * backend local; en producción es un error (no se puede adivinar dónde está el backend).
+ * Dirección pública del backend en producción: su propio subdominio. El frontend vive en
+ * https://gasstationerp.belsoftinc.net y el ETL en https://etl-gas-station.belsoftinc.net.
+ */
+export const URL_BACKEND_PRODUCCION = 'https://backend-gas-station.belsoftinc.net';
+
+/**
+ * URL del backend (solo del lado del servidor; el navegador usa /api/v1 en el mismo origen del frontend). Se lee de
+ * API_URL en cada petición, no al compilar: la misma imagen de Docker sirve para cualquier backend. Sin API_URL, en
+ * producción es el subdominio del backend (nunca localhost) y en desarrollo, el backend local. No puede ser la
+ * dirección de este mismo frontend: proxy.ts lo detecta y corta el bucle.
  */
 export function urlApi(): string {
   const url = process.env.API_URL?.trim();
   if (url) return url.replace(/\/+$/, '');
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('Falta la variable de entorno API_URL: la URL del backend (por ejemplo http://erp-backend:4000).');
-  }
-  return 'http://localhost:4000';
+  return process.env.NODE_ENV === 'production' ? URL_BACKEND_PRODUCCION : 'http://localhost:4000';
+}
+
+/** Cabeceras con las que el backend recibe la IP real del usuario (backend/src/compartido/http/ip-cliente.ts) */
+export const CABECERA_IP_CLIENTE = 'x-erp-ip-cliente';
+export const CABECERA_REENVIO = 'x-erp-reenvio';
+
+/**
+ * La IP real del usuario para el backend. Traefik deja en X-Forwarded-For la IP del navegador, pero al llamar al backend
+ * por su subdominio público, el Traefik de ese salto la reemplaza por la del propio servidor, y el límite de inicios de
+ * sesión sería uno solo para todos. Por eso va aparte, en X-Erp-Ip-Cliente, con SECRETO_REENVIO (el mismo valor en el
+ * frontend y en el backend): sin ese secreto el backend no la cree. Sin SECRETO_REENVIO no se manda nada.
+ */
+export function cabecerasDeReenvio(entrantes: Headers): Record<string, string> {
+  const secreto = process.env.SECRETO_REENVIO?.trim();
+  const ip = entrantes.get('x-forwarded-for')?.split(',')[0]?.trim();
+  return secreto && ip ? { [CABECERA_IP_CLIENTE]: ip, [CABECERA_REENVIO]: secreto } : {};
 }
 
 /** Cabecera interna con el perfil que el proxy ya consultó. */
