@@ -2,10 +2,20 @@
 import type { Perfil } from '@/api/tipos';
 
 /**
- * Dirección pública del backend en producción: su propio subdominio. El frontend vive en
- * https://gasstationerp.belsoftinc.net y el ETL en https://etl-gas-station.belsoftinc.net.
+ * Direcciones públicas de producción: cada proyecto en su propio subdominio de belsoftinc.net, por HTTPS (las mismas de
+ * URL_PRODUCCION en backend/src/config/entorno.ts y etl/src/config.ts).
+ *   frontend  este ERP, el único sitio que abre el navegador (puerto interno 3000)
+ *   backend   la API, a la que este frontend reenvía /api/v1 (puerto interno 4000)
+ *   etl       el servicio ETL (puerto interno 5000)
  */
-export const URL_BACKEND_PRODUCCION = 'https://backend-gas-station.belsoftinc.net';
+export const URL_PRODUCCION = {
+  frontend: 'https://gasstationconcepcion.belsoftinc.net',
+  backend: 'https://backend-gas-station.belsoftinc.net',
+  etl: 'https://etl-gas-station.belsoftinc.net',
+} as const;
+
+/** Dirección pública del backend en producción: su propio subdominio. */
+export const URL_BACKEND_PRODUCCION = URL_PRODUCCION.backend;
 
 /**
  * URL del backend (solo del lado del servidor; el navegador usa /api/v1 en el mismo origen del frontend). Se lee de

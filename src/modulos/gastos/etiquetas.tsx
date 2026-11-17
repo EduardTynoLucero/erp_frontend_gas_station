@@ -1,4 +1,4 @@
-/** Etiquetas y celdas compartidas por las pantallas de gastos (mismos textos del prototipo). */
+/** Etiquetas y celdas compartidas por las pantallas de gastos (mismos textos del diseño original). */
 import type { GastoResumen, OrigenGasto, TipoDocumento } from '@/api/tipos';
 import { Insignia } from '@/componentes/ui/insignia';
 import { q } from '@/lib/formato';
@@ -25,7 +25,7 @@ export const TIPO_DOCUMENTO: Record<TipoDocumento, string> = {
   'Sin documento': 'Sin documento',
 };
 
-/** Métodos para registrar un pago, en el orden del prototipo */
+/** Métodos para registrar un pago, en el orden del diseño original */
 export const METODOS_DE_PAGO = ['Transferencia', 'Cheque', 'Efectivo', 'Débito bancario', 'Tarjeta corporativa'];
 
 export function nombreProveedor(p: { nombre: string } | null): string {

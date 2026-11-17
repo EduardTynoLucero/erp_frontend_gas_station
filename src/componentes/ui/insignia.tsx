@@ -47,3 +47,18 @@ export function InsigniaEstado({ estado }: { estado: EstadoGasto }) {
   const e = ESTADOS[estado];
   return <Insignia tono={e.tono}>{e.texto}</Insignia>;
 }
+
+export type Severidad = 'critica' | 'alta' | 'media' | 'baja';
+
+/** Severidad de una alerta o de un hallazgo */
+export const SEVERIDADES: Record<Severidad, { texto: string; tono: Tono }> = {
+  critica: { texto: 'Crítica', tono: 'red' },
+  alta: { texto: 'Alta', tono: 'amber' },
+  media: { texto: 'Media', tono: 'blue' },
+  baja: { texto: 'Baja', tono: 'gray' },
+};
+
+export function InsigniaSeveridad({ severidad }: { severidad: Severidad }) {
+  const s = SEVERIDADES[severidad];
+  return <Insignia tono={s.tono}>{s.texto}</Insignia>;
+}

@@ -1,12 +1,12 @@
 'use client';
 
 import * as Menu from '@radix-ui/react-dropdown-menu';
-import { Check, ChevronDown, LogOut, Monitor, Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Check, ChevronDown, KeyRound, LogOut, Monitor, Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { iniciales } from '@/lib/utilidades';
 import { useErp } from './contexto';
-import { type Tema, useCambiarTema, useMontado } from './tema';
+import { DialogoClave } from './dialogo-clave';
+import { type Tema, useCambiarTema, useMontado, useTema } from './tema';
 
 const TEMAS: { valor: Tema; etiqueta: string; icono: typeof Sun }[] = [
   { valor: 'light', etiqueta: 'Claro', icono: Sun },
@@ -25,10 +25,12 @@ async function cerrarSesion(): Promise<void> {
 
 export function MenuUsuario() {
   const { perfil } = useErp();
-  const { theme } = useTheme();
+  const { tema } = useTema();
   const cambiarTema = useCambiarTema();
   const montado = useMontado();
   const [saliendo, setSaliendo] = useState(false);
+  // Si un administrador le puso la contraseña (usuario nuevo o restablecida), al entrar se le pide cambiarla
+  const [cambiandoClave, setCambiandoClave] = useState(perfil.sesion.debeCambiarClave);
   // Opción del menú, como las del menú de exportar de la plantilla: fila con línea abajo, roja suave al resaltarla
   const item =
     'flex min-h-[30px] w-full cursor-pointer select-none items-center gap-[7px] border-b border-borde-suave px-[9px] py-[5px] text-[12px] font-medium ' +
@@ -56,7 +58,7 @@ export function MenuUsuario() {
             </div>
           </div>
           <Menu.Label className="border-b border-borde-suave px-[9px] pb-[3px] pt-[6px] text-[10px] font-bold uppercase tracking-[0.05em] text-tenue">Tema</Menu.Label>
-          <Menu.RadioGroup value={montado ? (theme ?? 'system') : 'system'} onValueChange={(v) => cambiarTema(v as Tema)}>
+          <Menu.RadioGroup value={montado ? tema : 'system'} onValueChange={(v) => cambiarTema(v as Tema)}>
             {TEMAS.map((t) => (
               <Menu.RadioItem key={t.valor} value={t.valor} className={item} onSelect={(e) => e.preventDefault()}>
                 <t.icono className="size-[13px] opacity-70" />
@@ -67,6 +69,11 @@ export function MenuUsuario() {
               </Menu.RadioItem>
             ))}
           </Menu.RadioGroup>
+          <Menu.Label className="border-b border-borde-suave px-[9px] pb-[3px] pt-[6px] text-[10px] font-bold uppercase tracking-[0.05em] text-tenue">Cuenta</Menu.Label>
+          <Menu.Item className={item} onSelect={() => setCambiandoClave(true)}>
+            <KeyRound className="size-[13px] opacity-70" />
+            Cambiar contraseña
+          </Menu.Item>
           <Menu.Item
             className={`${item} border-b-0 text-[#c20510] data-[highlighted]:bg-[#fef2f2] data-[highlighted]:text-[#c20510] dark:text-red-300 dark:data-[highlighted]:bg-red-500/10 dark:data-[highlighted]:text-red-300`}
             disabled={saliendo}
@@ -80,6 +87,7 @@ export function MenuUsuario() {
           </Menu.Item>
         </Menu.Content>
       </Menu.Portal>
+      <DialogoClave abierto={cambiandoClave} obligatorio={perfil.sesion.debeCambiarClave} alCerrar={() => setCambiandoClave(false)} />
     </Menu.Root>
   );
 }

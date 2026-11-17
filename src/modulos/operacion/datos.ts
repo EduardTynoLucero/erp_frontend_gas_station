@@ -163,21 +163,3 @@ export function rangoRapido(max: string, tipo: Exclude<RapidoInventario, ''>): {
   if (tipo === 'mes') return { desde: `${max.slice(0, 7)}-01`, hasta: max };
   return { desde: masDias(max, -6), hasta: max };
 }
-
-/** Recordar la estación elegida en este navegador (si no se puede, no pasa nada) */
-export const preferencia = {
-  leer(clave: string): string | null {
-    try {
-      return localStorage.getItem(`erp:operacion:${clave}`);
-    } catch {
-      return null;
-    }
-  },
-  guardar(clave: string, valor: string) {
-    try {
-      localStorage.setItem(`erp:operacion:${clave}`, valor);
-    } catch {
-      // sin almacenamiento
-    }
-  },
-};

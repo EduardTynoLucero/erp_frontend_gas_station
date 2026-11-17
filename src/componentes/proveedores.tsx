@@ -3,17 +3,17 @@
 /** Proveedores globales: tema claro/oscuro, caché de datos (TanStack Query), tooltips y notificaciones. */
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, useTheme } from 'next-themes';
 import { type ReactNode, useState } from 'react';
 import { Toaster } from 'sonner';
 import { ErrorApi } from '@/api/cliente';
+import { ProveedorTema, useTema } from '@/componentes/marco/tema';
 
 function Notificaciones() {
-  const { resolvedTheme } = useTheme();
+  const { resuelto } = useTema();
   return (
     <Toaster
       position="bottom-right"
-      theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+      theme={resuelto}
       closeButton
       toastOptions={{
         classNames: {
@@ -41,13 +41,13 @@ export function Proveedores({ children }: { children: ReactNode }) {
       }),
   );
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ProveedorTema>
       <QueryClientProvider client={cliente}>
         <Tooltip.Provider delayDuration={150}>
           {children}
           <Notificaciones />
         </Tooltip.Provider>
       </QueryClientProvider>
-    </ThemeProvider>
+    </ProveedorTema>
   );
 }

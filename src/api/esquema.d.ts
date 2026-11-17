@@ -211,6 +211,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/clave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cambiar la contraseña propia
+         * @description Pide la contraseña actual y la nueva (mínimo 8 caracteres). Cierra las demás sesiones del usuario y deja viva la sesión con que se hizo el cambio: la respuesta trae la cookie erp_acceso nueva. Una contraseña actual incorrecta cuenta como intento fallido, igual que en el inicio de sesión (5 seguidos bloquean el usuario 15 minutos).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CambioClaveInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Perfil"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/gastos/catalogos": {
         parameters: {
             query?: never;
@@ -673,6 +720,211 @@ export interface paths {
             };
         };
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/{id}/comprobante": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Registrar o corregir el comprobante de un gasto ya enviado
+         * @description Quien registra en la estación, Tesorería o Contabilidad. Guarda el documento (FEL o recibo) y, si viene, el archivo ya subido con POST /gastos/adjuntos. La factura vuelve a quedar sin verificar. En un borrador el comprobante se cambia al editarlo.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ComprobanteInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["GastoDetalle"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/{id}/verificar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Marcar la factura FEL de un gasto como verificada
+         * @description Revisión de Contabilidad (permiso revisar). Queda quién la verificó y cuándo. No consulta a la SAT.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["GastoDetalle"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/adjuntos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Subir la foto o el PDF de un comprobante
+         * @description Cuerpo: el archivo tal cual, con su Content-Type (image/jpeg, image/png, image/webp, image/gif, image/heic o application/pdf) y su nombre en la cabecera X-Archivo-Nombre (codificado con encodeURIComponent). Hasta 5 MB. Se guarda en la base (expenses.adjunto_contenido). Devuelve su id para ponerlo en el comprobante de un gasto.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: {
+                    /** @description Nombre del archivo, codificado con encodeURIComponent */
+                    "x-archivo-nombre"?: string;
+                };
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Adjunto"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/gastos/adjuntos/{adjuntoId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Abrir el archivo de un comprobante
+         * @description Devuelve la foto o el PDF tal cual. Solo si el usuario lo subió o ve el gasto (o contrato) que lo lleva.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    adjuntoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Quitar un archivo subido que no se usó
+         * @description Solo quien lo subió y solo si no está puesto en ningún gasto.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    adjuntoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -1565,6 +1817,2845 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/preferencias": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preferencias de interfaz del usuario
+         * @description Lo que la interfaz recuerda de este usuario (módulos del menú abiertos, filtros a la vista, estación del filtro global). Se guardan en la base, no en el navegador. Cualquier usuario con sesión lee las suyas.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Preferencias"];
+                        };
+                    };
+                };
+            };
+        };
+        /**
+         * Guardar o quitar una preferencia de interfaz
+         * @description Guarda el valor de una clave para el usuario de la sesión; con valor null la quita. Devuelve todas las preferencias.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        clave: string;
+                        /** @description El valor nuevo; null la quita (vuelve a su valor por defecto) */
+                        valor: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Preferencias"];
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalogos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Catálogos y centros de costo, con el gasto del mes
+         * @description Categorías con sus subcategorías y cuenta contable, centros de costo por estación y unidad de negocio, y unidades. Los conteos y montos son de los gastos vigentes (por autorizar, aprobados y pagados) del periodo abierto que el usuario ve.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Solo los gastos y centros de costo de esa estación */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["CatalogosPantalla"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalogos/categorias": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Crear una categoría de gasto
+         * @description Exige el permiso catalogos. El código (2 a 6 letras o números) no se puede cambiar después.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CategoriaNuevaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                id: string;
+                                nombre: string;
+                                descripcion: string;
+                                cuentaContable: string;
+                                activa: boolean;
+                                subcategorias: string[];
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalogos/categorias/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Editar una categoría de gasto
+         * @description Reemplaza sus subcategorías por las recibidas, en ese orden. Inactiva deja de aparecer al registrar gastos.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CategoriaEditadaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                id: string;
+                                nombre: string;
+                                descripcion: string;
+                                cuentaContable: string;
+                                activa: boolean;
+                                subcategorias: string[];
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalogos/centros": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Crear un centro de costo
+         * @description Uno por estación y unidad de negocio; su código es {estación}-{unidad}. Si la estación no tenía esa unidad, se le agrega.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CentroCostoNuevoInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                codigo: string;
+                                nombre: string;
+                                estacion: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    codigo: string;
+                                    nombre: string;
+                                };
+                                unidad: {
+                                    codigo: string;
+                                    nombre: string;
+                                };
+                                activo: boolean;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalogos/centros/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Editar un centro de costo
+         * @description Solo el nombre y si está activo: la estación y la unidad van en su código.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CentroCostoEditadoInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                codigo: string;
+                                nombre: string;
+                                estacion: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    codigo: string;
+                                    nombre: string;
+                                };
+                                unidad: {
+                                    codigo: string;
+                                    nombre: string;
+                                };
+                                activo: boolean;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proveedores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Proveedores con sus gastos, lo pagado y lo por pagar
+         * @description Todos los proveedores (también los inactivos), del que más se le ha pagado o se le debe al que menos. Los gastos se cuentan con el alcance del usuario; «por pagar» son los aprobados que generan pago.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Los gastos, lo pagado y lo por pagar se cuentan solo en esa estación */
+                    estacionId?: string;
+                    /** @description Texto en el nombre, el NIT o el tipo */
+                    buscar?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["ProveedoresPantalla"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Dar de alta un proveedor
+         * @description Exige el permiso catalogos. El NIT no se puede repetir (se compara sin espacios ni guiones); vacío queda «Por definir».
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ProveedorDatosInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @description P01, P02… */
+                                codigo: string | null;
+                                nombre: string;
+                                nit: string;
+                                tipo: string;
+                                categoria: {
+                                    id: string;
+                                    nombre: string;
+                                } | null;
+                                contacto: string;
+                                telefono: string;
+                                diasCredito: number;
+                                /** @description De qué reporte del sistema de la estación salió, si no se dio de alta a mano */
+                                fuente: string | null;
+                                activo: boolean;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proveedores/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Editar un proveedor */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ProveedorDatosInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @description P01, P02… */
+                                codigo: string | null;
+                                nombre: string;
+                                nit: string;
+                                tipo: string;
+                                categoria: {
+                                    id: string;
+                                    nombre: string;
+                                } | null;
+                                contacto: string;
+                                telefono: string;
+                                diasCredito: number;
+                                /** @description De qué reporte del sistema de la estación salió, si no se dio de alta a mano */
+                                fuente: string | null;
+                                activo: boolean;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/proveedores/{id}/estado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Activar o desactivar un proveedor
+         * @description Un proveedor desactivado deja de ofrecerse al registrar gastos; sus gastos, contratos y plantillas se conservan.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        activo: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                id: string;
+                                /** @description P01, P02… */
+                                codigo: string | null;
+                                nombre: string;
+                                nit: string;
+                                tipo: string;
+                                categoria: {
+                                    id: string;
+                                    nombre: string;
+                                } | null;
+                                contacto: string;
+                                telefono: string;
+                                diasCredito: number;
+                                /** @description De qué reporte del sistema de la estación salió, si no se dio de alta a mano */
+                                fuente: string | null;
+                                activo: boolean;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contratos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Contratos y servicios por estación
+         * @description Los contratos de las estaciones del usuario, del que vence primero al último: días al vencimiento, estado (vencido, por vencer o vigente), el compromiso mensual y cuántos están por vencer sin renovación automática.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Solo los contratos de esa estación */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["ContratosPantalla"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Registrar un contrato
+         * @description Exige el permiso catalogos y que la estación esté en el alcance del usuario. El número (CT-001) lo pone la base.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ContratoDatosInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["ContratoDetalle"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contratos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Editar un contrato */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ContratoDatosInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["ContratoDetalle"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contratos/{id}/renovar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Renovar un contrato
+         * @description Extiende la fecha de fin los meses indicados. Solo quien autoriza y ve todas las estaciones (administración central).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        meses: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["ContratoDetalle"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recurrentes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Plantillas de gastos recurrentes
+         * @description Las plantillas de las estaciones del usuario, de la próxima fecha más cercana a la más lejana, con los días que faltan y si el usuario puede generar su gasto. El resumen trae las que tocan dentro del horizonte (o están atrasadas).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Solo las plantillas de esa estación */
+                    estacionId?: string;
+                    /** @description Días hacia adelante para «tocan en N días» (7, 15 o 31 en la pantalla) */
+                    horizonte?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["RecurrentesPantalla"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Crear una plantilla de gasto recurrente
+         * @description Exige el permiso catalogos y que la estación esté en el alcance del usuario. El código (RT1) lo pone la base.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RecurrenteDatosInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["RecurrenteDetalle"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recurrentes/generar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generar los gastos de una o varias plantillas
+         * @description Por cada plantilla crea un gasto ya enviado a autorización (origen «recurrente», con la fecha de la plantilla o la de hoy si todavía no llega) y avanza la plantilla a su siguiente periodo. Todas o ninguna. Exige el permiso registrar en la estación de cada plantilla; una plantilla que el usuario no ve se salta.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        ids: string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** @description Folios de los gastos generados, ya en autorización */
+                                folios: string[];
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recurrentes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Editar una plantilla */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RecurrenteDatosInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["RecurrenteDetalle"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recurrentes/{id}/estado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pausar o activar una plantilla
+         * @description Una plantilla pausada no genera gastos ni cuenta en el compromiso mensual.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        activo: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["RecurrenteDetalle"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/presupuestos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Presupuesto y ejecución del mes
+         * @description Por estación y categoría: presupuesto, ejecutado (aprobado o pagado), comprometido (por autorizar), disponible y % de uso. Solo las estaciones del usuario. Exige la pantalla Presupuestos.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Mes AAAA-MM. Omitido: el periodo abierto */
+                    periodo?: string;
+                    /** @description Filtro de estación del encabezado. Omitido: todas las que el usuario ve */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Presupuestos"];
+                        };
+                    };
+                };
+            };
+        };
+        /**
+         * Asignar o cambiar el presupuesto de una estación y categoría
+         * @description Crea la línea si no existe. Exige el permiso «Presupuestos y prorrateo» y que la estación esté en el alcance del usuario.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["LineaPresupuestoInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                periodo: string;
+                                /** Format: uuid */
+                                estacionId: string;
+                                categoriaId: string;
+                                monto: string;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/presupuestos/copiar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copiar el presupuesto de un mes a otro
+         * @description Copia las líneas que falten en el mes de destino (las que ya tienen monto no se cambian).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CopiarPresupuestosInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                desde: string;
+                                hacia: string;
+                                lineas: number;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/prorrateo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Prorrateo de los gastos de la oficina central
+         * @description Los gastos de la oficina central del mes, si ya están repartidos y el impacto en cada estación con el criterio elegido (según las ventas del ETL o en partes iguales). Exige la pantalla Prorrateo.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Mes AAAA-MM. Omitido: el periodo abierto */
+                    periodo?: string;
+                    /** @description Criterio con que se calcula la vista previa. Omitido: el de Configuración */
+                    criterio?: "ventas" | "partes_iguales";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Prorrateo"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/prorrateo/aplicar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Aplicar el prorrateo de un mes
+         * @description Reparte cada gasto de la oficina central entre las estaciones activas: cada parte a 2 decimales y la última estación se lleva el resto, así la suma es exacta. Reemplaza el reparto anterior del mes. Exige los permisos «Presupuestos y prorrateo» y «Ver todas las estaciones».
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AplicarProrrateoInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                periodo: string;
+                                /**
+                                 * @description El criterio con que quedó aplicado
+                                 * @enum {string}
+                                 */
+                                criterio: "ventas" | "partes_iguales";
+                                total: string;
+                                gastos: number;
+                                estaciones: number;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/prorrateo/{periodo}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Quitar el prorrateo de un mes */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    periodo: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                periodo: string;
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/caja-chica": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cajas chicas con su saldo y sus movimientos
+         * @description Fondo fijo por estación: saldo, lo que falta por liquidar, lo que está en reposición y los movimientos. Solo las cajas de las estaciones del usuario. Exige la pantalla Caja chica.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filtro de estación del encabezado. Omitido: todas las que el usuario ve */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["CajasChicas"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Abrir el fondo de caja chica de una estación
+         * @description Crea la caja (una por estación) con su movimiento de apertura. Exige el permiso «Cambiar parámetros y estaciones».
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AbrirCajaChicaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["CajaChica"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/caja-chica/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Cambiar el fondo, el responsable o el estado de una caja
+         * @description El fondo no puede quedar por debajo de lo desembolsado sin reponer. Exige el permiso «Cambiar parámetros y estaciones».
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EditarCajaChicaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["CajaChica"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/caja-chica/{id}/desembolsos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Registrar un desembolso de caja chica
+         * @description Exige el permiso «Operar caja chica» y la estación de la caja. Hasta el tope por desembolso y el saldo del fondo; desde el monto configurado, con comprobante.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["DesembolsoCajaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["CajaChica"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/caja-chica/{id}/liquidar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Liquidar la caja y pedir la reposición
+         * @description Los desembolsos pendientes quedan con su liquidación (LIQ-{caja}-{n}) y entra a autorización un gasto por cada categoría. El fondo se repone cuando Tesorería los paga.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                caja: components["schemas"]["CajaChica"];
+                                /** @description Código de la liquidación: LIQ-{caja}-{n} */
+                                liquidacion: string;
+                                total: string;
+                                /** @description Un gasto por autorizar por cada categoría */
+                                gastos: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    folio: string;
+                                    monto: string;
+                                }[];
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Compras administrativas
+         * @description Requerimientos, cotizaciones, órdenes y recepciones de las estaciones del usuario (con alcance «solo lo propio», las que solicitó), de la más reciente a la más antigua. Cada una trae lo que el usuario puede hacer con ella. Exige la pantalla Compras o Mis solicitudes.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filtro de estación del encabezado. Omitido: todas las que el usuario ve */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Compras"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Nuevo requerimiento de compra
+         * @description Exige el permiso de registrar y que la estación esté en el alcance del usuario. El número (OC-{año}-{n}) lo asigna el sistema.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RequerimientoCompraInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["OrdenCompra"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/{id}/cotizaciones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Agregar una cotización
+         * @description Mientras la compra es un requerimiento o está cotizando. La compra pasa a «cotizando».
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CotizacionCompraInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["OrdenCompra"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/{id}/cotizaciones/{cotizacionId}/emitir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Emitir la orden de compra con una cotización
+         * @description La autoriza quien tiene límite de autorización para ese monto y no es quien la solicitó. La orden toma el proveedor y el monto de la cotización.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    cotizacionId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["OrdenCompra"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/{id}/recibir": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Registrar la recepción y la factura del proveedor
+         * @description Genera un gasto aprobado (origen «compra») con la factura FEL, que pasa a cuentas por pagar con vencimiento a los días de crédito del proveedor. Una factura que el proveedor ya tiene registrada se rechaza (422).
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RecepcionCompraInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["OrdenCompra"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/compras/{id}/cancelar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancelar una compra
+         * @description Mientras no esté recibida. La cancela quien la solicitó o quien autoriza en la estación.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["OrdenCompra"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usuarios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Usuarios, roles, permisos y pantallas
+         * @description Cada usuario con su rol, sus ajustes propios y su acceso efectivo; cada rol con sus pantallas y permisos; y los catálogos para los formularios. `maneja` dice si quien consulta puede administrar a ese usuario o ese rol (nadie maneja a quien tiene más acceso que él). Exige la pantalla Usuarios y roles.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["AdministracionUsuarios"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Crear un usuario
+         * @description Con su rol, sus estaciones, sus ajustes propios y su contraseña inicial (mínimo 8 caracteres). Solo se guarda lo que difiere del rol. Exige el permiso «Administrar usuarios y roles» y que el usuario no quede con más acceso que quien lo crea.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["NuevoUsuarioInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["UsuarioAdministrado"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usuarios/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Editar un usuario
+         * @description Nadie cambia su propio rol, permisos, pantallas, límite ni estaciones: solo su nombre y su usuario.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EditarUsuarioInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["UsuarioAdministrado"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usuarios/{id}/estado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Activar o desactivar un usuario
+         * @description Al desactivarlo deja de entrar en el acto: sus sesiones se cierran. Nadie se desactiva a sí mismo.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        activo: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["UsuarioAdministrado"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usuarios/{id}/clave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restablecer la contraseña de otro usuario
+         * @description Mínimo 8 caracteres. Cierra las sesiones abiertas de esa persona. La contraseña propia se cambia en POST /api/v1/auth/clave.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description Al menos 8 caracteres */
+                        nueva: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["UsuarioAdministrado"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usuarios/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Crear un rol
+         * @description El paquete base de un puesto: pantallas, permisos, límite de autorización y alcance.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RolEntradaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["RolAdministrado"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/usuarios/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Editar un rol
+         * @description Cambia para todos sus usuarios (menos los ajustes propios de cada uno). Si el rol es un nivel de autorización, su límite se copia a la política de Configuración. Nadie cambia el alcance del rol que él mismo tiene.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RolEntradaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["RolAdministrado"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/estaciones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Empresa y estaciones
+         * @description La empresa y cada estación que el usuario ve, con su responsable, sus unidades de negocio, el gasto del periodo abierto, las ventas y los turnos del ETL, sus centros de costo y su caja chica. Exige la pantalla Empresas y estaciones.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["EmpresaYEstaciones"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Crear una estación
+         * @description Crea la estación con un centro de costo por cada unidad de negocio y, con fondoCaja mayor que cero, su caja chica con el saldo inicial. Exige los permisos «Cambiar parámetros y estaciones» y «Ver todas las estaciones».
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["NuevaEstacionInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["EstacionAdministrada"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/estaciones/empresa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Corregir los datos de la empresa
+         * @description Razón social, NIT y franquicia. Exige el permiso «Cambiar parámetros y estaciones».
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EmpresaEntradaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Empresa"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/estaciones/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Editar una estación
+         * @description El código no cambia (lo usan sus centros de costo). Una unidad de negocio nueva estrena su centro de costo.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EditarEstacionInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["EstacionAdministrada"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/configuracion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Parámetros y niveles de autorización
+         * @description Fecha del sistema y periodo abierto, control documental, caja chica, alertas, prorrateo y los niveles de autorización por monto. La consulta quien tiene la pantalla Configuración, aunque no la modifique.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Configuracion"];
+                        };
+                    };
+                };
+            };
+        };
+        /**
+         * Guardar la configuración
+         * @description Exige el permiso «Cambiar parámetros y estaciones». Los topes de autorización deben ir en aumento y los cambia quien además administra usuarios y roles: al guardar, el límite de cada rol se actualiza. `version` es la que se tenía en pantalla: si otra persona guardó antes, responde 409 (VERSION_DESACTUALIZADA).
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConfiguracionEntradaInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Configuracion"];
+                            /** @description Mensaje para mostrar al usuario */
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hallazgos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Hallazgos de los reportes
+         * @description Riesgos encontrados al analizar los reportes de la estación, de las estaciones que el usuario ve: primero los que siguen abiertos y los más graves. Trae también lo que hace falta para registrar uno o pasar su pérdida a gasto. Exige la pantalla Hallazgos de reportes.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    estacionId?: string;
+                    estado?: "abierta" | "en_revision" | "cerrada";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Hallazgos"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Registrar un hallazgo
+         * @description Registro manual (origen MANUAL). Exige el permiso de dar seguimiento a hallazgos y que la estación esté en el alcance del usuario.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["NuevoHallazgoInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Hallazgo"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hallazgos/analizar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Analizar los reportes cargados de un mes
+         * @description Genera o actualiza los hallazgos de origen ETL de un mes (por omisión, el periodo abierto): alertas de ticket (precio fuera de pricebook, posible duplicado, sin producto), venta bajo costo con su pérdida, saltos en la numeración de tickets y merma de las tomas físicas por encima de la tolerancia. Uno por estación, mes y regla: volver a analizar actualiza las cifras sin repetir el hallazgo ni reabrir uno cerrado.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description Mes a analizar; si no se indica, el periodo abierto */
+                        periodo?: string;
+                    } | null;
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["AnalisisDeReportes"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hallazgos/{id}/estado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cambiar el estado de un hallazgo
+         * @description Marcar en revisión, cerrar o reabrir. Exige el permiso de dar seguimiento a hallazgos.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        estado: "abierta" | "en_revision" | "cerrada";
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Hallazgo"];
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hallazgos/{id}/gasto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Registrar la pérdida de un hallazgo como gasto
+         * @description Crea un gasto por autorizar de origen «reporte» (ajuste contable sin factura, método «No aplica») con el código del hallazgo como referencia. Exige dar seguimiento a hallazgos y registrar gastos en esa estación. Una sola vez por hallazgo.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GastoDeHallazgoInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                hallazgo: components["schemas"]["Hallazgo"];
+                                gasto: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    folio: string;
+                                    monto: string;
+                                };
+                            };
+                            mensaje: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auditoria": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bitácora de operaciones
+         * @description Cada creación, autorización, pago y cambio de configuración, con su usuario y su hora, del más reciente al más antiguo. Filtra por usuario, entidad, acción, rango de fechas y texto (en el detalle o en los folios). Trae también las listas para los filtros. Para exportar, recorrer las páginas (hasta 200 eventos por página). Exige la pantalla Auditoría y trazabilidad.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    usuarioId?: string;
+                    entidad?: string;
+                    accion?: string;
+                    /** @description Texto en el detalle o en los folios (G-2026-0001, OC-2026-001…) */
+                    buscar?: string;
+                    /** @description Desde este día (hora de Guatemala) */
+                    desde?: string;
+                    /** @description Hasta este día, incluido (hora de Guatemala) */
+                    hasta?: string;
+                    pagina?: number;
+                    porPagina?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Bitacora"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Alertas del control de gastos
+         * @description Avisos calculados al momento con los parámetros de Configuración: presupuesto por agotarse o excedido, gastos sin comprobante, pagos por vencer, autorizaciones atrasadas, caja chica con saldo bajo, contratos por vencer y plantillas recurrentes que tocan pronto. Cada grupo sale solo si el usuario tiene la pantalla que da ese dato. Exige la pantalla Alertas o el Tablero.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filtro de estación (la del selector de la barra); sin él, todas las que el usuario ve */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Alertas"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas/contadores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Números del menú: alertas y hallazgos
+         * @description Alertas que no son de severidad baja y hallazgos sin cerrar. Para cualquier usuario con sesión: sin la pantalla, 0.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filtro de estación (la del selector de la barra); sin él, todas las que el usuario ve */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["ContadoresDelMenu"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tablero": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Tablero de gastos
+         * @description Gasto del mes abierto y su relación con las ventas del ETL, presupuesto usado, lo que está por autorizar y por pagar, pérdidas tomadas de reportes, gasto por categoría, por estación y por día, primeras alertas, hallazgos y últimos movimientos. Exige la pantalla Tablero de gastos.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filtro de estación (la del selector de la barra); sin él, todas las que el usuario ve */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Tablero"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/indicadores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Indicadores gerenciales
+         * @description Gasto sobre ventas total y por estación (sin la oficina central), principales proveedores del mes, gasto por cada Q1,000 vendidos por categoría y estación, desviación contra presupuesto, pérdidas tomadas de reportes y gastos fuera de lo normal. Exige la pantalla Indicadores gerenciales.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filtro de estación (la del selector de la barra); sin él, todas las que el usuario ve */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["Indicadores"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reporte de gastos por eje y por mes
+         * @description Los gastos que el usuario ve, agrupados por categoría, subcategoría, estación, proveedor, centro de costo, unidad de negocio, forma de pago u origen, con una columna por mes. Con prorrateo=true, los gastos de la oficina central ya prorrateados se reparten entre las estaciones. Exige la pantalla Reportes.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    eje?: "categoria" | "subcategoria" | "estacion" | "proveedor" | "centro" | "unidad" | "metodo" | "origen";
+                    /** @description Un mes (AAAA-MM); vacío u omitido = comparar todos los meses con gastos */
+                    periodo?: string;
+                    estados?: "vigentes" | "ejecutados" | "pagados";
+                    /** @description true = repartir los gastos de la oficina central según su prorrateo aplicado */
+                    prorrateo?: "true" | "false";
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["ReporteDeGastos"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/franquicia": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Gastos de franquicia
+         * @description Gastos vigentes de la categoría de franquicia de las estaciones (sin la oficina central): cargos del mes y su peso sobre las ventas, próximo cargo de las plantillas recurrentes, contratos, tabla por estación y mes y los cargos registrados. Exige la pantalla Gastos de franquicia.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Filtro de estación (la del selector de la barra); sin él, todas las que el usuario ve */
+                    estacionId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: components["schemas"]["GastosDeFranquicia"];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1595,6 +4686,623 @@ export interface components {
             }[];
             instance: string;
             solicitudId: string;
+        };
+        DocumentoGastoInput: {
+            /**
+             * @default Sin documento
+             * @enum {string}
+             */
+            tipo: "FEL" | "Recibo" | "Sin documento";
+            /** @default  */
+            serie: string;
+            /** @default  */
+            numero: string;
+            /** @default null */
+            fechaEmision: string | null;
+        };
+        NuevoGastoInput: {
+            /**
+             * Format: date
+             * @description Fecha del gasto (no posterior a hoy)
+             */
+            fecha: string;
+            /** Format: uuid */
+            estacionId: string;
+            /**
+             * Format: uuid
+             * @description Debe pertenecer a la estación
+             */
+            centroCostoId: string;
+            categoriaId: string;
+            /** @default  */
+            subcategoria: string;
+            /** @default null */
+            proveedorId: string | null;
+            descripcion: string;
+            /** @default GTQ */
+            moneda: string;
+            /** @description Importe del documento en su moneda, como texto: "1500.00". Mayor que cero, sin más decimales que la moneda */
+            monto: string;
+            /** @description Quetzales por unidad de la moneda. Obligatorio si la moneda no es GTQ */
+            tipoCambio?: string;
+            metodoPago: string;
+            /**
+             * @default {
+             *       "tipo": "Sin documento",
+             *       "serie": "",
+             *       "numero": "",
+             *       "fechaEmision": null
+             *     }
+             */
+            documento: components["schemas"]["DocumentoGastoInput"];
+            /** @description Omitido: fecha + días de crédito del proveedor (0 sin proveedor). null: sin vencimiento */
+            vencimiento?: string | null;
+            /**
+             * @description true = enviar a autorización (pendiente); false = guardar como borrador
+             * @default false
+             */
+            enviar: boolean;
+        };
+        ActualizarGastoInput: {
+            /**
+             * Format: date
+             * @description Fecha del gasto (no posterior a hoy)
+             */
+            fecha: string;
+            /** Format: uuid */
+            estacionId: string;
+            /**
+             * Format: uuid
+             * @description Debe pertenecer a la estación
+             */
+            centroCostoId: string;
+            categoriaId: string;
+            /** @default  */
+            subcategoria: string;
+            /** @default null */
+            proveedorId: string | null;
+            descripcion: string;
+            /** @default GTQ */
+            moneda: string;
+            /** @description Importe del documento en su moneda, como texto: "1500.00". Mayor que cero, sin más decimales que la moneda */
+            monto: string;
+            /** @description Quetzales por unidad de la moneda. Obligatorio si la moneda no es GTQ */
+            tipoCambio?: string;
+            metodoPago: string;
+            /**
+             * @default {
+             *       "tipo": "Sin documento",
+             *       "serie": "",
+             *       "numero": "",
+             *       "fechaEmision": null
+             *     }
+             */
+            documento: components["schemas"]["DocumentoGastoInput"];
+            /** @description Omitido: fecha + días de crédito del proveedor (0 sin proveedor). null: sin vencimiento */
+            vencimiento?: string | null;
+            /**
+             * @description true = enviar a autorización (pendiente); false = guardar como borrador
+             * @default false
+             */
+            enviar: boolean;
+            /** @description Versión que tenía en pantalla (bloqueo optimista) */
+            version: number;
+        };
+        PagoInput: {
+            /** Format: date */
+            fecha: string;
+            metodo: string;
+            referencia: string;
+        };
+        ComprobanteInput: {
+            /** @enum {string} */
+            tipo: "FEL" | "Recibo" | "Sin documento";
+            /** @default  */
+            serie: string;
+            /** @default  */
+            numero: string;
+            /** @default null */
+            fechaEmision: string | null;
+            /**
+             * @description Id del archivo ya subido con POST /gastos/adjuntos; null = sin archivo
+             * @default null
+             */
+            adjuntoId: string | null;
+        };
+        /** @description Foto o PDF de un comprobante. El archivo se abre en GET /gastos/adjuntos/{id} */
+        AdjuntoInput: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            tipoMime: string;
+            bytes: number;
+        };
+        /** @description Qué puede hacer el usuario con el gasto y, si no, por qué */
+        AccionesGastoInput: {
+            editar: components["schemas"]["VerificacionInput"];
+            enviar: components["schemas"]["VerificacionInput"];
+            eliminar: components["schemas"]["VerificacionInput"];
+            reabrir: components["schemas"]["VerificacionInput"];
+            aprobar: components["schemas"]["VerificacionInput"];
+            rechazar: components["schemas"]["VerificacionInput"];
+            pagar: components["schemas"]["VerificacionInput"];
+            comprobante: components["schemas"]["VerificacionInput"];
+            verificar: components["schemas"]["VerificacionInput"];
+        };
+        GastoResumenInput: {
+            /** Format: uuid */
+            id: string;
+            folio: string;
+            fecha: string;
+            /** @description AAAA-MM */
+            periodo: string;
+            /** @enum {string} */
+            estado: "borrador" | "pendiente" | "aprobado" | "rechazado" | "pagado";
+            /** @enum {string} */
+            origen: "manual" | "recurrente" | "reporte" | "caja_chica" | "compra";
+            referencia: string | null;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            centroCosto: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            categoria: {
+                id: string;
+                nombre: string;
+            };
+            subcategoria: string;
+            proveedor: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+                nit: string;
+            } | null;
+            descripcion: string;
+            moneda: {
+                codigo: string;
+                simbolo: string;
+            };
+            /** @description Importe en la moneda del gasto, con sus decimales: "1500.00" */
+            monto: string;
+            tipoCambio: string;
+            /** @description Equivalente en GTQ (lo calcula la base) */
+            montoFuncional: string;
+            /** @description IVA incluido (FEL), en la moneda del gasto */
+            iva: string;
+            metodoPago: string;
+            documento: {
+                /** @enum {string} */
+                tipo: "FEL" | "Recibo" | "Sin documento";
+                serie: string;
+                numero: string;
+                fechaEmision: string | null;
+                verificado: boolean;
+                /** @description Quién marcó la factura FEL como verificada */
+                verificadoPor: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                } | null;
+                verificadoEn: string | null;
+                adjunto: components["schemas"]["AdjuntoInput"] | null;
+            };
+            vencimiento: string | null;
+            solicitante: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            /** @description Quién lo autoriza según el monto */
+            nivelRequerido: string | null;
+            esAjusteContable: boolean;
+            faltaComprobante: boolean;
+            acciones: components["schemas"]["AccionesGastoInput"];
+            pago: {
+                fecha: string;
+                metodo: string;
+                referencia: string;
+                monto: string;
+                usuario: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                };
+                registradoEn: string;
+            } | null;
+            version: number;
+            creadoEn: string;
+            actualizadoEn: string;
+        };
+        GastoDetalleInput: {
+            /** Format: uuid */
+            id: string;
+            folio: string;
+            fecha: string;
+            /** @description AAAA-MM */
+            periodo: string;
+            /** @enum {string} */
+            estado: "borrador" | "pendiente" | "aprobado" | "rechazado" | "pagado";
+            /** @enum {string} */
+            origen: "manual" | "recurrente" | "reporte" | "caja_chica" | "compra";
+            referencia: string | null;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            centroCosto: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            categoria: {
+                id: string;
+                nombre: string;
+            };
+            subcategoria: string;
+            proveedor: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+                nit: string;
+            } | null;
+            descripcion: string;
+            moneda: {
+                codigo: string;
+                simbolo: string;
+            };
+            /** @description Importe en la moneda del gasto, con sus decimales: "1500.00" */
+            monto: string;
+            tipoCambio: string;
+            /** @description Equivalente en GTQ (lo calcula la base) */
+            montoFuncional: string;
+            /** @description IVA incluido (FEL), en la moneda del gasto */
+            iva: string;
+            metodoPago: string;
+            documento: {
+                /** @enum {string} */
+                tipo: "FEL" | "Recibo" | "Sin documento";
+                serie: string;
+                numero: string;
+                fechaEmision: string | null;
+                verificado: boolean;
+                /** @description Quién marcó la factura FEL como verificada */
+                verificadoPor: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                } | null;
+                verificadoEn: string | null;
+                adjunto: components["schemas"]["AdjuntoInput"] | null;
+            };
+            vencimiento: string | null;
+            solicitante: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            /** @description Quién lo autoriza según el monto */
+            nivelRequerido: string | null;
+            esAjusteContable: boolean;
+            faltaComprobante: boolean;
+            acciones: components["schemas"]["AccionesGastoInput"];
+            pago: {
+                fecha: string;
+                metodo: string;
+                referencia: string;
+                monto: string;
+                usuario: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                };
+                registradoEn: string;
+            } | null;
+            version: number;
+            creadoEn: string;
+            actualizadoEn: string;
+            aprobaciones: {
+                /** Format: uuid */
+                id: string;
+                usuario: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                };
+                /** @enum {string} */
+                accion: "aprobado" | "rechazado";
+                comentario: string;
+                fecha: string;
+                registradaEn: string;
+            }[];
+            /** @description Bitácora de auditoría de este folio, del más reciente al más antiguo */
+            historial: {
+                id: string;
+                usuario: string;
+                accion: string;
+                detalle: string;
+                ocurridoEn: string;
+            }[];
+            /** @description Reparto entre estaciones de un gasto de la oficina central (prorrateo aplicado); vacío si no tiene */
+            distribucion: {
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                };
+                /** @description Porcentaje con 2 decimales */
+                pct: string;
+                monto: string;
+            }[];
+            /** @description Nombres de quienes pueden autorizarlo ahora (solo si está pendiente) */
+            autorizadores: string[];
+        };
+        CatalogosGastoInput: {
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                esOficinaCentral: boolean;
+            }[];
+            centrosCosto: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                /** Format: uuid */
+                estacionId: string;
+                unidadCodigo: string;
+            }[];
+            categorias: {
+                id: string;
+                nombre: string;
+                cuentaContable: string;
+                subcategorias: string[];
+            }[];
+            proveedores: {
+                /** Format: uuid */
+                id: string;
+                codigo: string | null;
+                nombre: string;
+                nit: string;
+                categoriaId: string | null;
+                diasCredito: number;
+            }[];
+            metodosPago: {
+                codigo: string;
+                esAjuste: boolean;
+                paraPago: boolean;
+            }[];
+            monedas: {
+                codigo: string;
+                nombre: string;
+                simbolo: string;
+                decimales: number;
+                esFuncional: boolean;
+            }[];
+            niveles: {
+                orden: number;
+                etiqueta: string;
+                hasta: string | null;
+            }[];
+            parametros: {
+                hoy: string;
+                periodoActual: string;
+                tasaIvaPct: string;
+                comprobanteObligatorioDesde: string;
+                monedaFuncional: string;
+                /** @description Con cuántos días de anticipación se avisa que un pago vence (Configuración) */
+                diasAlertaVencimiento: number;
+            };
+        };
+        InicioSesionInput: {
+            usuario: string;
+            clave: string;
+        };
+        PantallaInput: {
+            /** @description Ruta del frontend: gastos, autorizaciones, dashboard-ventas… */
+            codigo: string;
+            nombre: string;
+            /** @description Grupo del menú */
+            grupo: string;
+            orden: number;
+            /** @enum {string} */
+            modulo: "expenses" | "dashboards" | "ingesta" | "iam" | "org" | "audit";
+        };
+        PerfilInput: {
+            usuario: {
+                /** Format: uuid */
+                id: string;
+                usuario: string;
+                nombre: string;
+                correo: string | null;
+                rol: {
+                    codigo: string;
+                    nombre: string;
+                };
+            };
+            acceso: {
+                /** @description ¿A qué módulos del frontend entra? Base para proteger rutas en Next.js */
+                modulos: {
+                    gastos: boolean;
+                    dashboards: boolean;
+                    administracion: boolean;
+                    auditoria: boolean;
+                };
+                /** @description Pantallas efectivas en el orden del menú */
+                pantallas: components["schemas"]["PantallaInput"][];
+                /** @description Permisos efectivos: registrar, aprobar, pagar, ver_todo… */
+                permisos: string[];
+                /** @description Tope para autorizar en GTQ. null = sin límite; "0.00" = no autoriza */
+                limiteAutorizacion: string | null;
+                alcance: {
+                    verTodo: boolean;
+                    soloPropios: boolean;
+                    estaciones: {
+                        /** Format: uuid */
+                        id: string;
+                        codigo: string;
+                        nombre: string;
+                        esOficinaCentral: boolean;
+                        activa: boolean;
+                    }[];
+                };
+            };
+            sesion: {
+                /** @description Vencimiento del token de acceso (ISO 8601) */
+                expiraEn: string | null;
+                debeCambiarClave: boolean;
+            };
+            /** @description La empresa (org.empresa), para el encabezado del frontend */
+            empresa: {
+                /** @description Razón social de la empresa */
+                nombre: string;
+                /** @description Franquicia (Puma Energy…); null si no tiene */
+                franquicia: string | null;
+            };
+        };
+        CambioClaveInput: {
+            actual: string;
+            nueva: string;
+        };
+        NuevoHallazgoInput: {
+            /** @enum {string} */
+            severidad: "critica" | "alta" | "media" | "baja";
+            titulo: string;
+            /**
+             * @description Monto en riesgo, en quetzales, como texto ("1500.00"); null si no se puede valorar
+             * @default null
+             */
+            monto: string | null;
+            /** Format: uuid */
+            estacionId: string;
+            /** @default  */
+            fuente: string;
+            /** @default  */
+            detalle: string;
+            /** @default  */
+            accion: string;
+            /**
+             * Format: date
+             * @description Fecha del hallazgo (no posterior a hoy)
+             */
+            fecha: string;
+        };
+        GastoDeHallazgoInput: {
+            categoriaId: string;
+            /**
+             * @description Vacía: la primera de la categoría
+             * @default
+             */
+            subcategoria: string;
+            /**
+             * Format: uuid
+             * @description Omitido: el centro de administración de la estación del hallazgo
+             */
+            centroCostoId?: string;
+            /** @description Pérdida a registrar, en quetzales, como texto */
+            monto: string;
+            /**
+             * @description Vacía: el título del hallazgo
+             * @default
+             */
+            descripcion: string;
+        };
+        HallazgoInput: {
+            /** Format: uuid */
+            id: string;
+            codigo: string;
+            /** @enum {string} */
+            severidad: "critica" | "alta" | "media" | "baja";
+            titulo: string;
+            /** @description Monto en riesgo en GTQ; null si no está valorado (por ejemplo, galones) */
+            monto: string | null;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            fuente: string;
+            detalle: string;
+            accion: string;
+            /** @enum {string} */
+            estado: "abierta" | "en_revision" | "cerrada";
+            fecha: string;
+            /**
+             * @description MANUAL = lo registró una persona; ETL = salió del análisis de los reportes cargados
+             * @enum {string}
+             */
+            origen: "MANUAL" | "ETL";
+            /** @description El gasto con que se registró la pérdida, si ya se registró */
+            gasto: {
+                /** Format: uuid */
+                id: string;
+                /** @description null si el usuario no ve ese gasto */
+                folio: string | null;
+            } | null;
+            acciones: {
+                registrarGasto: components["schemas"]["VerificacionInput"];
+            };
+        };
+        HallazgosInput: {
+            hoy: string;
+            periodoActual: string;
+            /** @description Tiene el permiso de dar seguimiento: registrar, cambiar el estado y analizar los reportes */
+            gestiona: boolean;
+            /** @description Además registra gastos: puede pasar la pérdida de un hallazgo a gasto por autorizar */
+            puedeRegistrarGasto: boolean;
+            /** @description Hallazgos sin cerrar (abiertos o en revisión) de la estación filtrada */
+            abiertos: number;
+            hallazgos: components["schemas"]["HallazgoInput"][];
+            /** @description Estaciones activas que el usuario ve (para registrar un hallazgo) */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            }[];
+            /** @description Categorías activas, para registrar la pérdida como gasto */
+            categorias: {
+                id: string;
+                nombre: string;
+                subcategorias: string[];
+            }[];
+            /** @description Centros de costo activos de las estaciones que el usuario ve */
+            centros: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                /** Format: uuid */
+                estacionId: string;
+            }[];
+        };
+        AnalisisDeReportesInput: {
+            periodo: string;
+            creados: number;
+            /** @description Hallazgos que ya existían y cuyas cifras cambiaron */
+            actualizados: number;
+            sinCambios: number;
+            /** @description Estaciones del ETL que no están ligadas a ninguna estación del ERP: sus alertas no generan hallazgos */
+            sinEstacion: string[];
+            hallazgos: {
+                codigo: string;
+                titulo: string;
+                estacion: string;
+                nuevo: boolean;
+            }[];
         };
         CargaDeSubidaInput: {
             /** Format: uuid */
@@ -1670,7 +5378,7 @@ export interface components {
         };
         ResumenIngestaInput: {
             servicio: {
-                /** @description El servicio ETL está escuchando la cola (npm run dev en etl/) */
+                /** @description El servicio ETL está escuchando la cola de subidas */
                 activo: boolean;
             };
             puedeSubir: boolean;
@@ -2123,7 +5831,1638 @@ export interface components {
                 turno: number | null;
             }[];
         };
-        DocumentoGastoInput: {
+        AlertaInput: {
+            /** @description Estable mientras dure la causa: pres-…, doc-…, venc-…, aut-…, caja-…, ct-…, rec-… */
+            id: string;
+            /** @enum {string} */
+            tipo: "presupuesto" | "comprobante" | "vencimiento" | "autorizacion" | "caja" | "contrato" | "recurrente";
+            /** @enum {string} */
+            severidad: "critica" | "alta" | "media" | "baja";
+            titulo: string;
+            detalle: string;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+            };
+            /** @description Pantalla donde se atiende: /presupuestos, /gastos/<id>, /caja-chica, /contratos o /recurrentes */
+            ruta: string;
+            monto: string | null;
+        };
+        AlertasInput: {
+            hoy: string;
+            /** @description Mes AAAA-MM */
+            periodo: string;
+            /** @description De la más grave a la menos grave */
+            alertas: components["schemas"]["AlertaInput"][];
+            /** @description Cuántas hay de cada tipo */
+            conteo: {
+                [key: string]: number;
+            };
+            /** @description Los parámetros de Configuración con que se calculan */
+            parametros: {
+                alertaPresupuestoPct: number;
+                diasAlertaVencimiento: number;
+                diasAlertaPendiente: number;
+            };
+        };
+        ContadoresDelMenuInput: {
+            /** @description Alertas que no son de severidad baja; 0 sin la pantalla Alertas */
+            alertas: number;
+            /** @description Hallazgos sin cerrar; 0 sin la pantalla Hallazgos de reportes */
+            hallazgos: number;
+        };
+        TableroInput: {
+            /** @description Mes AAAA-MM */
+            periodo: string;
+            hoy: string;
+            fechaCorte: string;
+            diasAlertaVencimiento: number;
+            puedeRegistrar: boolean;
+            vePresupuesto: boolean;
+            veAlertas: boolean;
+            veHallazgos: boolean;
+            /** @description Gasto del mes: por autorizar, aprobados y pagados */
+            total: string;
+            cantidad: number;
+            /** @description Ventas del mes de las estaciones del filtro (ETL) */
+            ventas: string;
+            /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+            pctSobreVentas: number | null;
+            /** @description null sin la pantalla Presupuestos */
+            presupuesto: {
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                usado: string;
+                /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+                pct: number | null;
+                /** @description red = excedido; amber = desde el 90 % */
+                tono: ("red" | "amber") | null;
+            } | null;
+            porAutorizar: {
+                cantidad: number;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            };
+            porPagar: {
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+                /** @description Vencen dentro de diasAlertaVencimiento (o ya vencieron) */
+                vencen: number;
+            };
+            /** @description Gastos vigentes de origen «reporte», sin las comisiones (FIN) */
+            perdidas: {
+                cantidad: number;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            };
+            porCategoria: {
+                id: string;
+                nombre: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+                pct: number;
+            }[];
+            /** @description Vacío sin la pantalla Presupuestos */
+            porEstacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                presupuesto: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                gasto: string;
+            }[];
+            /** @description Del día 1 al corte */
+            diario: {
+                fecha: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            }[];
+            alertas: {
+                total: number;
+                primeras: components["schemas"]["AlertaInput"][];
+            };
+            /** @description Hasta 4, primero los abiertos y más graves; vacío sin la pantalla Hallazgos */
+            hallazgos: components["schemas"]["HallazgoInput"][];
+            recientes: {
+                /** Format: uuid */
+                id: string;
+                folio: string;
+                fecha: string;
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                };
+                descripcion: string;
+                /** @enum {string} */
+                estado: "borrador" | "pendiente" | "aprobado" | "rechazado" | "pagado";
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            }[];
+        };
+        IndicadoresInput: {
+            /** @description Mes AAAA-MM */
+            periodo: string;
+            hoy: string;
+            fechaCorte: string;
+            /** @description Gasto vigente del mes, con la oficina central */
+            total: string;
+            /** @description De las estaciones (sin la oficina central) */
+            gastoSobreVentas: {
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                gasto: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                ventas: string;
+                /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+                pct: number | null;
+            };
+            perdidas: {
+                cantidad: number;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            };
+            categoriasSobrePresupuesto: number;
+            porEstacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                gasto: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                ventas: string;
+                /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+                ratioPct: number | null;
+            }[];
+            /** @description Los 6 con más gasto en el mes */
+            proveedores: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            }[];
+            /** @description Gasto por cada Q1,000 vendidos, por categoría y estación */
+            matriz: {
+                estaciones: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                }[];
+                filas: {
+                    categoria: {
+                        id: string;
+                        nombre: string;
+                    };
+                    /** @description Uno por estación, en el mismo orden */
+                    valores: {
+                        /** @description Importe en GTQ como texto decimal ("1500.00") */
+                        valor: string;
+                        mayor: boolean;
+                    }[];
+                }[];
+            };
+            desviacion: {
+                categoria: {
+                    id: string;
+                    nombre: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                presupuesto: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                usado: string;
+                /** @description usado − presupuesto (puede ser negativo) */
+                diferencia: string;
+            }[];
+            inusuales: {
+                total: number;
+                lista: {
+                    /** Format: uuid */
+                    id: string;
+                    folio: string;
+                    descripcion: string;
+                    estacion: {
+                        /** Format: uuid */
+                        id: string;
+                        codigo: string;
+                    };
+                    /** @description Importe en GTQ como texto decimal ("1500.00") */
+                    monto: string;
+                    origen: string;
+                    motivo: string;
+                }[];
+            };
+        };
+        ReporteDeGastosInput: {
+            /** @enum {string} */
+            eje: "categoria" | "subcategoria" | "estacion" | "proveedor" | "centro" | "unidad" | "metodo" | "origen";
+            etiquetaEje: string;
+            ejes: {
+                /** @enum {string} */
+                clave: "categoria" | "subcategoria" | "estacion" | "proveedor" | "centro" | "unidad" | "metodo" | "origen";
+                etiqueta: string;
+            }[];
+            periodo: string | null;
+            /** @enum {string} */
+            estados: "vigentes" | "ejecutados" | "pagados";
+            prorrateo: boolean;
+            /** @description Meses con gastos que el usuario ve */
+            periodos: string[];
+            /** @description El mes pedido, o todos los meses con gastos */
+            columnas: string[];
+            filas: {
+                clave: string;
+                etiqueta: string;
+                /** @description Solo los meses con monto */
+                porMes: {
+                    [key: string]: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+                /** @description Parte del total del reporte */
+                pct: number;
+                registros: number;
+            }[];
+            totales: {
+                /** @description Monto por mes (clave AAAA-MM) */
+                porMes: {
+                    [key: string]: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+            };
+            /** @description Gastos del filtro (con prorrateo, uno puede repartirse en varias filas) */
+            registros: number;
+            /** @description Fecha de corte de los datos (AAAA-MM-DD): el último mes llega solo hasta este día */
+            fechaCorte: string;
+        };
+        GastosDeFranquiciaInput: {
+            /** @description Mes AAAA-MM */
+            periodo: string;
+            hoy: string;
+            empresa: string;
+            /** @description Nombre de la franquicia (org.empresa) */
+            franquicia: string | null;
+            veRecurrentes: boolean;
+            veContratos: boolean;
+            cargosDelMes: {
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+                cantidad: number;
+            };
+            /** @description Importe en GTQ como texto decimal ("1500.00") */
+            ventas: string;
+            /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+            pctSobreVentas: number | null;
+            proximoCargo: {
+                /** @description Suma de las plantillas recurrentes activas de franquicia */
+                monto: string;
+                /** @description Cuándo toca la primera */
+                fecha: string | null;
+                plantillas: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    estacion: {
+                        /** Format: uuid */
+                        id: string;
+                        codigo: string;
+                    };
+                    /** @description Importe en GTQ como texto decimal ("1500.00") */
+                    monto: string;
+                    frecuencia: string;
+                    proximaFecha: string;
+                }[];
+            };
+            contratos: {
+                cantidad: number;
+                proximoVencimiento: string | null;
+                lista: {
+                    /** Format: uuid */
+                    id: string;
+                    numero: string;
+                    objeto: string;
+                    proveedor: string;
+                    estacion: {
+                        /** Format: uuid */
+                        id: string;
+                        codigo: string;
+                    };
+                    /** @description Importe en GTQ como texto decimal ("1500.00") */
+                    montoMensual: string;
+                    fin: string;
+                    diasParaVencer: number;
+                }[];
+            };
+            periodos: string[];
+            porEstacion: {
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                };
+                /** @description Monto por mes (clave AAAA-MM) */
+                porMes: {
+                    [key: string]: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+            }[];
+            totales: {
+                /** @description Monto por mes (clave AAAA-MM) */
+                porMes: {
+                    [key: string]: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+            };
+            cargosTotal: number;
+            cargos: {
+                /** Format: uuid */
+                id: string;
+                folio: string;
+                fecha: string;
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                };
+                descripcion: string;
+                subcategoria: string;
+                /** @enum {string} */
+                estado: "borrador" | "pendiente" | "aprobado" | "rechazado" | "pagado";
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            }[];
+        };
+        EventoBitacoraInput: {
+            /** @description Número del evento (correlativo) */
+            id: string;
+            /** @description Cuándo ocurrió (ISO 8601, UTC) */
+            ocurridoEn: string;
+            /** @description Fecha del negocio con que se registró (AAAA-MM-DD) */
+            fechaNegocio: string | null;
+            usuario: {
+                /** @description null = proceso del sistema */
+                id: string | null;
+                nombre: string;
+            };
+            modulo: string;
+            accion: string;
+            entidad: string;
+            detalle: string;
+            /** @description Folios y números visibles que menciona el evento */
+            referencias: string[];
+        };
+        BitacoraInput: {
+            eventos: components["schemas"]["EventoBitacoraInput"][];
+            paginacion: components["schemas"]["PaginacionInput"];
+            /** @description Lo que hay en la bitácora, para armar los filtros de la pantalla */
+            filtros: {
+                usuarios: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                }[];
+                entidades: string[];
+                acciones: string[];
+            };
+        };
+        AbrirCajaChicaInput: {
+            /** Format: uuid */
+            estacionId: string;
+            /** @description Fondo fijo en quetzales, como texto: "3000.00". Mayor que cero */
+            fondo: string;
+            /**
+             * Format: uuid
+             * @description Usuario activo que maneja la caja
+             */
+            responsableId: string;
+        };
+        EditarCajaChicaInput: {
+            /** @description Nuevo fondo fijo. No puede ser menor que lo desembolsado sin reponer */
+            fondo: string;
+            /** Format: uuid */
+            responsableId: string;
+            activa: boolean;
+        };
+        DesembolsoCajaInput: {
+            /**
+             * Format: date
+             * @description Fecha del desembolso (no posterior a hoy)
+             */
+            fecha: string;
+            descripcion: string;
+            /** @description En quetzales, como texto: "125.50". Mayor que cero, hasta el tope por desembolso y el saldo de la caja */
+            monto: string;
+            categoriaId: string;
+            /**
+             * @description FEL o recibo. Obligatorio desde el monto de Configuración
+             * @default
+             */
+            comprobante: string;
+        };
+        CajaChicaInput: {
+            /** Format: uuid */
+            id: string;
+            codigo: string;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            responsable: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            fondo: string;
+            /** @description Fondo menos los desembolsos que no se han repuesto */
+            saldo: string;
+            porLiquidar: string;
+            porLiquidarCantidad: number;
+            /** @description Liquidado y esperando autorización o pago */
+            enReposicion: string;
+            usoPct: number;
+            activa: boolean;
+            /** @description Si el usuario registra desembolsos y liquida esta caja */
+            puedeOperar: components["schemas"]["VerificacionInput"];
+            /** @description Del más reciente al más antiguo (los últimos 300) */
+            movimientos: {
+                /** Format: uuid */
+                id: string;
+                fecha: string;
+                /** @enum {string} */
+                tipo: "apertura" | "desembolso";
+                descripcion: string;
+                monto: string;
+                categoria: {
+                    id: string;
+                    nombre: string;
+                } | null;
+                comprobante: string;
+                /**
+                 * @description repuesto = su liquidación ya se pagó y el fondo volvió
+                 * @enum {string}
+                 */
+                estado: "apertura" | "por_liquidar" | "en_reposicion" | "repuesto";
+                /** @description Código de la liquidación (LIQ-CC1-1), si ya se liquidó */
+                liquidacion: string | null;
+            }[];
+            totalMovimientos: number;
+        };
+        CajasChicasInput: {
+            hoy: string;
+            /** @description El usuario tiene el permiso de operar caja chica */
+            opera: boolean;
+            /** @description El usuario abre fondos y los cambia (permiso «Cambiar parámetros y estaciones») */
+            puedeAdministrar: boolean;
+            parametros: {
+                limiteDesembolso: string;
+                comprobanteObligatorioDesde: string;
+            };
+            cajas: components["schemas"]["CajaChicaInput"][];
+            /** @description Donde se puede abrir un fondo (solo para quien administra) */
+            estacionesSinCaja: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            }[];
+            /** @description Usuarios activos, para elegir responsable (solo para quien administra) */
+            responsables: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            }[];
+            /** @description Categorías activas, para el desembolso */
+            categorias: {
+                id: string;
+                nombre: string;
+            }[];
+        };
+        CategoriaNuevaInput: {
+            /** @description 2 a 6 letras o números, ej. LIM */
+            id: string;
+            nombre: string;
+            /** @default  */
+            descripcion: string;
+            /** @default  */
+            cuentaContable: string;
+            /**
+             * @description En el orden en que deben aparecer. Las que ya no vengan se quitan
+             * @default []
+             */
+            subcategorias: string[];
+            /**
+             * @description Activa = aparece al registrar gastos
+             * @default true
+             */
+            activa: boolean;
+        };
+        CategoriaEditadaInput: {
+            nombre: string;
+            /** @default  */
+            descripcion: string;
+            /** @default  */
+            cuentaContable: string;
+            /**
+             * @description En el orden en que deben aparecer. Las que ya no vengan se quitan
+             * @default []
+             */
+            subcategorias: string[];
+            /**
+             * @description Activa = aparece al registrar gastos
+             * @default true
+             */
+            activa: boolean;
+        };
+        CentroCostoNuevoInput: {
+            /** Format: uuid */
+            estacionId: string;
+            unidadCodigo: string;
+            /**
+             * @description Vacío: se arma con la unidad y la estación
+             * @default
+             */
+            nombre: string;
+            /** @default true */
+            activo: boolean;
+        };
+        CentroCostoEditadoInput: {
+            /**
+             * @description Vacío: se arma con la unidad y la estación
+             * @default
+             */
+            nombre: string;
+            /** @default true */
+            activo: boolean;
+        };
+        CatalogoCategoriaInput: {
+            id: string;
+            nombre: string;
+            descripcion: string;
+            cuentaContable: string;
+            activa: boolean;
+            subcategorias: {
+                nombre: string;
+                /** @description Gastos del mes en esa subcategoría */
+                gastos: number;
+            }[];
+            /** @description Gastos vigentes del mes */
+            gastos: number;
+            /** @description Suma en GTQ de esos gastos */
+            monto: string;
+        };
+        CatalogoCentroCostoInput: {
+            /** Format: uuid */
+            id: string;
+            /** @description {estación}-{unidad} */
+            codigo: string;
+            nombre: string;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            unidad: {
+                codigo: string;
+                nombre: string;
+            };
+            activo: boolean;
+            gastos: number;
+            monto: string;
+        };
+        CatalogosPantallaInput: {
+            /** @description Periodo abierto (AAAA-MM): los conteos y montos son de ese mes */
+            periodo: string;
+            /** @description Tiene el permiso «Catálogos, proveedores, contratos y recurrentes» */
+            puedeEditar: boolean;
+            /** @description Todas, también las inactivas */
+            categorias: components["schemas"]["CatalogoCategoriaInput"][];
+            /** @description De las estaciones que el usuario ve (o de la del filtro) */
+            centros: components["schemas"]["CatalogoCentroCostoInput"][];
+            /** @description En el orden del catálogo */
+            unidades: {
+                codigo: string;
+                nombre: string;
+                activa: boolean;
+                /** @description Gasto del mes de sus centros de costo */
+                monto: string;
+                /** @description Su parte de ese gasto entre todas las unidades, de 0 a 100: solo para dibujar la barra */
+                pct: number;
+            }[];
+            /** @description Estaciones que el usuario ve, para el formulario de centro de costo */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                activa: boolean;
+            }[];
+        };
+        RequerimientoCompraInput: {
+            /** Format: uuid */
+            estacionId: string;
+            /**
+             * Format: uuid
+             * @description Debe pertenecer a la estación
+             */
+            centroCostoId: string;
+            categoriaId: string;
+            descripcion: string;
+        };
+        CotizacionCompraInput: {
+            /** Format: uuid */
+            proveedorId: string;
+            /** @description En quetzales, como texto: "1850.00". Mayor que cero */
+            monto: string;
+            /** @default 0 */
+            diasEntrega: number;
+            /** @default  */
+            nota: string;
+        };
+        RecepcionCompraInput: {
+            /** @default  */
+            serie: string;
+            numero: string;
+        };
+        OrdenCompraInput: {
+            /** Format: uuid */
+            id: string;
+            /** @description OC-{año}-{correlativo} */
+            numero: string;
+            fecha: string;
+            /** @enum {string} */
+            estado: "requerimiento" | "cotizando" | "ordenada" | "recibida" | "cancelada";
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            centroCosto: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            categoria: {
+                id: string;
+                nombre: string;
+            };
+            descripcion: string;
+            solicitante: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            /** @description El de la cotización elegida */
+            proveedor: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            } | null;
+            /** @description El de la cotización elegida */
+            monto: string | null;
+            fechaOrden: string | null;
+            fechaRecepcion: string | null;
+            /** @description Quien emitió la orden */
+            aprobador: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            } | null;
+            /** @description El gasto aprobado que generó la recepción */
+            gasto: {
+                /** Format: uuid */
+                id: string;
+                folio: string;
+            } | null;
+            cotizaciones: {
+                /** Format: uuid */
+                id: string;
+                proveedor: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                };
+                monto: string;
+                diasEntrega: number;
+                nota: string;
+                /** @description La cotización con que se emitió la orden */
+                elegida: boolean;
+                /** @description La de menor monto, cuando hay más de una */
+                esMenor: boolean;
+                /** @description Quién autoriza ese monto */
+                nivelRequerido: string;
+                /** @description Si el usuario puede emitir la orden con esta cotización */
+                emitir: components["schemas"]["VerificacionInput"];
+            }[];
+            acciones: {
+                cotizar: components["schemas"]["VerificacionInput"];
+                recibir: components["schemas"]["VerificacionInput"];
+                cancelar: components["schemas"]["VerificacionInput"];
+            };
+        };
+        ComprasInput: {
+            hoy: string;
+            /** @description El usuario registra requerimientos (permiso de registrar y la pantalla Compras) */
+            puedeCrear: boolean;
+            /** @description De la más reciente a la más antigua (las últimas 200) */
+            ordenes: components["schemas"]["OrdenCompraInput"][];
+            /** @description Cuántas compras cumplen el filtro */
+            total: number;
+            /** @description Lo activo, para los formularios de requerimiento y de cotización */
+            catalogos: {
+                /** @description Donde el usuario puede registrar */
+                estaciones: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                }[];
+                centrosCosto: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    /** Format: uuid */
+                    estacionId: string;
+                    unidadCodigo: string;
+                }[];
+                categorias: {
+                    id: string;
+                    nombre: string;
+                }[];
+                proveedores: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                }[];
+            };
+        };
+        LimiteUsuarioInput: {
+            /** @enum {string} */
+            modo: "ROL" | "SIN_LIMITE" | "MONTO";
+            /** @description Solo con modo MONTO: tope propio en GTQ, como texto ("1500.00") */
+            monto?: string | null;
+        };
+        NuevoUsuarioInput: {
+            usuario: string;
+            nombre: string;
+            /**
+             * @description Opcional. Vacío o null = sin correo
+             * @default null
+             */
+            correo: string | null;
+            /** Format: uuid */
+            rolId: string;
+            /** @description org.estacion asignadas. Al menos una */
+            estaciones: string[];
+            /** @default true */
+            activo: boolean;
+            /**
+             * @description Permisos que tiene además de los de su rol
+             * @default []
+             */
+            permisosExtra: string[];
+            /**
+             * @description Permisos de su rol que se le quitan
+             * @default []
+             */
+            permisosQuitados: string[];
+            /**
+             * @description Pantallas que ve además de las de su rol
+             * @default []
+             */
+            pantallasExtra: string[];
+            /**
+             * @description Pantallas de su rol que no ve
+             * @default []
+             */
+            pantallasQuitadas: string[];
+            /**
+             * @description ROL = el de su rol; SIN_LIMITE; MONTO = tope propio
+             * @default {
+             *       "modo": "ROL"
+             *     }
+             */
+            limite: components["schemas"]["LimiteUsuarioInput"];
+            /**
+             * @description null = como su rol; true = solo lo que registra; false = todo lo de sus estaciones
+             * @default null
+             */
+            soloPropios: boolean | null;
+            /** @description Contraseña inicial: al menos 8 caracteres */
+            clave: string;
+        };
+        EditarUsuarioInput: {
+            usuario: string;
+            nombre: string;
+            /**
+             * @description Opcional. Vacío o null = sin correo
+             * @default null
+             */
+            correo: string | null;
+            /** Format: uuid */
+            rolId: string;
+            /** @description org.estacion asignadas. Al menos una */
+            estaciones: string[];
+            /** @default true */
+            activo: boolean;
+            /**
+             * @description Permisos que tiene además de los de su rol
+             * @default []
+             */
+            permisosExtra: string[];
+            /**
+             * @description Permisos de su rol que se le quitan
+             * @default []
+             */
+            permisosQuitados: string[];
+            /**
+             * @description Pantallas que ve además de las de su rol
+             * @default []
+             */
+            pantallasExtra: string[];
+            /**
+             * @description Pantallas de su rol que no ve
+             * @default []
+             */
+            pantallasQuitadas: string[];
+            /**
+             * @description ROL = el de su rol; SIN_LIMITE; MONTO = tope propio
+             * @default {
+             *       "modo": "ROL"
+             *     }
+             */
+            limite: components["schemas"]["LimiteUsuarioInput"];
+            /**
+             * @description null = como su rol; true = solo lo que registra; false = todo lo de sus estaciones
+             * @default null
+             */
+            soloPropios: boolean | null;
+        };
+        RolEntradaInput: {
+            nombre: string;
+            /** @default  */
+            descripcion: string;
+            permisos: string[];
+            pantallas: string[];
+            /** @description Tope para autorizar en GTQ. null = sin límite; "0" = no autoriza */
+            limiteAutorizacion: string | null;
+            /**
+             * @description El rol solo ve lo que el mismo usuario registró
+             * @default false
+             */
+            soloPropios: boolean;
+        };
+        UsuarioAdministradoInput: {
+            /** Format: uuid */
+            id: string;
+            usuario: string;
+            nombre: string;
+            correo: string | null;
+            activo: boolean;
+            rol: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            /** @description Estaciones asignadas */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+            }[];
+            /** @description Tiene «Ver todas las estaciones»: las asignadas aplican si se le quita ese permiso */
+            verTodo: boolean;
+            /** @description Lo que esta persona tiene distinto a su rol */
+            ajustes: {
+                permisosExtra: string[];
+                permisosQuitados: string[];
+                pantallasExtra: string[];
+                pantallasQuitadas: string[];
+                limite: {
+                    /** @enum {string} */
+                    modo: "ROL" | "SIN_LIMITE" | "MONTO";
+                    monto: string | null;
+                };
+                soloPropios: boolean | null;
+            };
+            tieneAjustes: boolean;
+            /** @description Permisos efectivos (rol + agregados − quitados) */
+            permisos: string[];
+            /** @description Pantallas efectivas, en el orden del menú */
+            pantallas: string[];
+            /** @description Tope para autorizar en GTQ: null = sin límite; "0.00" = no autoriza */
+            limiteEfectivo: string | null;
+            /** @description Alcance efectivo: solo ve lo que registra */
+            soloPropios: boolean;
+            ultimoAccesoEn: string | null;
+            /** @description Su contraseña la puso un administrador y todavía no la ha cambiado */
+            debeCambiarClave: boolean;
+            /** @description ¿Quien consulta puede administrar a este usuario? (no tiene más acceso que él) */
+            maneja: components["schemas"]["VerificacionInput"];
+        };
+        RolAdministradoInput: {
+            /** Format: uuid */
+            id: string;
+            codigo: string;
+            nombre: string;
+            descripcion: string;
+            permisos: string[];
+            pantallas: string[];
+            /** @description null = sin límite */
+            limiteAutorizacion: string | null;
+            soloPropios: boolean;
+            esSistema: boolean;
+            usuariosActivos: number;
+            /** @description Es un nivel de la política de autorización: su límite también va en Configuración */
+            esNivel: boolean;
+            /** @description ¿Quien consulta puede editar este rol? */
+            maneja: components["schemas"]["VerificacionInput"];
+        };
+        AdministracionUsuariosInput: {
+            /** @description Tiene el permiso «Administrar usuarios y roles» */
+            puedeAdministrar: boolean;
+            /** @description Largo mínimo de una contraseña nueva */
+            claveMinima: number;
+            /** @description Lo que quien consulta puede dar a otros */
+            yo: {
+                /** Format: uuid */
+                id: string;
+                permisos: string[];
+                pantallas: string[];
+            };
+            usuarios: components["schemas"]["UsuarioAdministradoInput"][];
+            roles: components["schemas"]["RolAdministradoInput"][];
+            /** @description Catálogo de permisos, en su orden */
+            permisos: {
+                codigo: string;
+                nombre: string;
+            }[];
+            /** @description Catálogo de pantallas, en el orden del menú */
+            pantallas: {
+                codigo: string;
+                nombre: string;
+                grupo: string;
+            }[];
+            /** @description Estaciones que quien consulta puede asignar */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                activa: boolean;
+            }[];
+        };
+        ConfiguracionEntradaInput: {
+            /** @description Versión que tenía en pantalla (bloqueo optimista) */
+            version: number;
+            /** @description Fecha con que se registran gastos, aprobaciones y pagos (AAAA-MM-DD). null = la fecha real de Guatemala */
+            fechaSistema: string | null;
+            /** @description Periodo abierto, AAAA-MM */
+            periodoActual: string;
+            /** @description Desde qué monto (GTQ) es obligatorio el comprobante */
+            comprobanteObligatorioDesde: string;
+            /** @description Tope por desembolso de caja chica (GTQ) */
+            limiteDesembolsoCaja: string;
+            /** @description Avisar cuando la ejecución del presupuesto llega a este porcentaje */
+            alertaPresupuestoPct: string;
+            diasAlertaVencimiento: number;
+            diasAlertaPendiente: number;
+            /** @enum {string} */
+            criterioProrrateo: "ventas" | "partes_iguales";
+            /** @description Comisión de tarjeta, en porcentaje ("3.5" = 3.5 %) */
+            tasaComisionTarjetaPct: string;
+            /** @description Diferencia aceptable entre lo vendido y lo medido en el tanque, en porcentaje */
+            toleranciaMermaPct: string;
+            /**
+             * @description Niveles de autorización con su tope; el que no se envía queda como está. Cambiarlos exige además «Administrar usuarios y roles»
+             * @default []
+             */
+            niveles: {
+                orden: number;
+                /** @description Autoriza hasta (GTQ). null = sin límite */
+                hasta: string | null;
+            }[];
+        };
+        ConfiguracionInput: {
+            /** @description Tiene el permiso «Cambiar parámetros y estaciones» */
+            puedeEditar: boolean;
+            /** @description Además administra usuarios y roles: puede cambiar los topes de autorización */
+            puedeEditarNiveles: boolean;
+            /** @description Se devuelve al guardar: si otra persona guardó antes, 409 */
+            version: number;
+            parametros: {
+                /** @description Hoy para el negocio: la fecha del sistema si está fijada; si no, la de Guatemala */
+                hoy: string;
+                /** @description null = se usa la fecha real */
+                fechaSistema: string | null;
+                /** @description AAAA-MM */
+                periodoActual: string;
+                /** @description Hasta qué día hay datos (solo consulta) */
+                fechaCorte: string;
+                comprobanteObligatorioDesde: string;
+                limiteDesembolsoCaja: string;
+                /** @description Porcentaje como texto decimal, sin ceros de relleno ("90") */
+                alertaPresupuestoPct: string;
+                diasAlertaVencimiento: number;
+                diasAlertaPendiente: number;
+                /** @enum {string} */
+                criterioProrrateo: "ventas" | "partes_iguales";
+                /** @description En porcentaje ("3.5" = 3.5 %) */
+                tasaComisionTarjetaPct: string;
+                toleranciaMermaPct: string;
+                /** @description Solo consulta */
+                tasaIvaPct: string;
+            };
+            niveles: {
+                orden: number;
+                /** Format: uuid */
+                rolId: string;
+                etiqueta: string;
+                /** @description null = sin límite */
+                hasta: string | null;
+                /** @description ¿Quien consulta puede cambiar este tope? Es el límite de su rol: valen las reglas de Usuarios y roles */
+                puedeCambiar: components["schemas"]["VerificacionInput"];
+            }[];
+        };
+        ProveedorDatosInput: {
+            nombre: string;
+            /**
+             * @description Vacío = «Por definir». No se puede repetir
+             * @default
+             */
+            nit: string;
+            /** @default  */
+            tipo: string;
+            /**
+             * @description Categoría principal
+             * @default null
+             */
+            categoriaId: string | null;
+            /** @default  */
+            contacto: string;
+            /** @default  */
+            telefono: string;
+            /** @default 0 */
+            diasCredito: number;
+        };
+        ProveedorDetalleInput: {
+            /** Format: uuid */
+            id: string;
+            /** @description P01, P02… */
+            codigo: string | null;
+            nombre: string;
+            nit: string;
+            tipo: string;
+            categoria: {
+                id: string;
+                nombre: string;
+            } | null;
+            contacto: string;
+            telefono: string;
+            diasCredito: number;
+            /** @description De qué reporte del sistema de la estación salió, si no se dio de alta a mano */
+            fuente: string | null;
+            activo: boolean;
+            /** @description Gastos del proveedor que el usuario ve */
+            gastos: number;
+            /** @description Suma en GTQ de sus gastos pagados */
+            pagado: string;
+            /** @description Suma en GTQ de sus gastos aprobados que generan pago */
+            porPagar: string;
+        };
+        ProveedoresPantallaInput: {
+            /** @description Tiene el permiso «Catálogos, proveedores, contratos y recurrentes» */
+            puedeEditar: boolean;
+            proveedores: components["schemas"]["ProveedorDetalleInput"][];
+            /** @description Para elegir la categoría principal */
+            categorias: {
+                id: string;
+                nombre: string;
+                activa: boolean;
+            }[];
+        };
+        ContratoDatosInput: {
+            objeto: string;
+            /** Format: uuid */
+            proveedorId: string;
+            /** Format: uuid */
+            estacionId: string;
+            categoriaId: string;
+            /** @description En quetzales, como texto: "4500.00". Puede ser 0 */
+            montoMensual: string;
+            /** Format: date */
+            inicio: string;
+            /**
+             * Format: date
+             * @description Posterior al inicio
+             */
+            fin: string;
+            /** @default false */
+            renovacionAutomatica: boolean;
+            /** @default 30 */
+            avisoDias: number;
+            /**
+             * @description Nombre del archivo o ubicación física. Vacío = «Pendiente de digitalizar»
+             * @default
+             */
+            documento: string;
+        };
+        ContratoDetalleInput: {
+            /** Format: uuid */
+            id: string;
+            /** @description CT-001 */
+            numero: string;
+            objeto: string;
+            proveedor: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            categoria: {
+                id: string;
+                nombre: string;
+            };
+            montoMensual: string;
+            inicio: string;
+            fin: string;
+            renovacionAutomatica: boolean;
+            avisoDias: number;
+            documento: string;
+            /** @description Días que faltan para que venza (negativo: días que lleva vencido) */
+            dias: number;
+            /** @enum {string} */
+            estado: "Vencido" | "Por vencer" | "Vigente";
+            /** @description Vence dentro de su plazo de aviso (o ya venció) y no se renueva solo */
+            porVencer: boolean;
+            /** @description No está vigente: quien renueva contratos puede extenderlo */
+            renovable: boolean;
+        };
+        ContratosPantallaInput: {
+            /** @description Fecha del negocio con que se calculan los días */
+            hoy: string;
+            /** @description Tiene el permiso «Catálogos, proveedores, contratos y recurrentes» */
+            puedeEditar: boolean;
+            /** @description Autoriza y ve todas las estaciones (administración central) */
+            puedeRenovar: boolean;
+            resumen: {
+                contratos: number;
+                compromisoMensual: string;
+                /** @description Por vencer sin renovación automática */
+                porVencer: number;
+                renovacionAutomatica: number;
+            };
+            /** @description Del que vence primero al que vence último */
+            contratos: components["schemas"]["ContratoDetalleInput"][];
+            /** @description Lo que ofrece el formulario */
+            opciones: {
+                estaciones: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    activa: boolean;
+                }[];
+                proveedores: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                    activo: boolean;
+                }[];
+                categorias: {
+                    id: string;
+                    nombre: string;
+                    activa: boolean;
+                }[];
+            };
+        };
+        NuevaEstacionInput: {
+            codigo: string;
+            nombre: string;
+            /** @default  */
+            direccion: string;
+            /**
+             * @description Responsable de la estación (iam.usuario). null = sin responsable
+             * @default null
+             */
+            gerenteId: string | null;
+            /** @description Unidades de negocio (org.unidad_negocio): se crea un centro de costo por cada una */
+            unidades: string[];
+            /**
+             * @description Código de la estación en el ETL: la liga con sus ventas y turnos. null o vacío = sin datos operativos
+             * @default null
+             */
+            codigoEtl: string | null;
+            /**
+             * @description Fondo de caja chica en GTQ, como texto. "0" = sin caja chica
+             * @default 0
+             */
+            fondoCaja: string;
+        };
+        EditarEstacionInput: {
+            nombre: string;
+            /** @default  */
+            direccion: string;
+            /**
+             * @description Responsable de la estación (iam.usuario). null = sin responsable
+             * @default null
+             */
+            gerenteId: string | null;
+            /** @description Unidades de negocio (org.unidad_negocio): se crea un centro de costo por cada una */
+            unidades: string[];
+            /**
+             * @description Código de la estación en el ETL: la liga con sus ventas y turnos. null o vacío = sin datos operativos
+             * @default null
+             */
+            codigoEtl: string | null;
+            activa: boolean;
+        };
+        EmpresaEntradaInput: {
+            nombre: string;
+            /** @default  */
+            nit: string;
+            /** @default null */
+            franquicia: string | null;
+        };
+        EmpresaInput: {
+            nombre: string;
+            nit: string;
+            franquicia: string | null;
+            moneda: string;
+        };
+        EstacionAdministradaInput: {
+            /** Format: uuid */
+            id: string;
+            codigo: string;
+            nombre: string;
+            direccion: string;
+            gerente: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            } | null;
+            unidades: {
+                codigo: string;
+                nombre: string;
+            }[];
+            esOficinaCentral: boolean;
+            codigoEtl: string | null;
+            demo: boolean;
+            activa: boolean;
+            /** @description Gasto del periodo abierto (por autorizar, aprobado y pagado), en GTQ */
+            gastoMes: string;
+            /** @description Ventas del periodo según el ETL. null = no aplica (sin código en el ETL o sin ventas) */
+            ventasMes: string | null;
+            /** @description Gasto sobre ventas, en porcentaje. null si no hay ventas */
+            ratioPct: number | null;
+            /** @description Centros de costo de la estación */
+            centros: number;
+            /** @description Del primer al último turno cargado en el ETL */
+            turnos: {
+                min: number;
+                max: number;
+            } | null;
+            /** @description Su caja chica, si tiene */
+            caja: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                fondo: string;
+                activa: boolean;
+            } | null;
+        };
+        EmpresaYEstacionesInput: {
+            /** @description Tiene el permiso «Cambiar parámetros y estaciones» */
+            puedeEditar: boolean;
+            /** @description Crear una estación exige además ver todas las estaciones */
+            puedeCrear: components["schemas"]["VerificacionInput"];
+            /** @description Periodo abierto (AAAA-MM): el del gasto y las ventas del mes */
+            periodo: string;
+            fechaCorte: string;
+            empresa: components["schemas"]["EmpresaInput"];
+            /** @description Solo las estaciones que el usuario ve */
+            estaciones: components["schemas"]["EstacionAdministradaInput"][];
+            /** @description Catálogo de unidades de negocio */
+            unidades: {
+                codigo: string;
+                nombre: string;
+            }[];
+            /** @description Usuarios activos, para elegir al responsable (solo si puede editar) */
+            usuarios: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            }[];
+            /** @description Estaciones que existen en el ETL y a cuál del ERP está ligada cada una */
+            estacionesEtl: {
+                codigo: string;
+                nombre: string;
+                estacionId: string | null;
+            }[];
+        };
+        /** @description Las preferencias del usuario: clave → valor (texto corto cuyo significado da la clave) */
+        PreferenciasInput: {
+            [key: string]: string;
+        };
+        LineaPresupuestoInput: {
+            periodo: string;
+            /** Format: uuid */
+            estacionId: string;
+            categoriaId: string;
+            /** @description Presupuesto mensual en quetzales, como texto: "5000.00". Cero o más, hasta 2 decimales */
+            monto: string;
+        };
+        CopiarPresupuestosInput: {
+            /** @description Mes de origen */
+            desde: string;
+            /** @description Mes de destino: recibe las líneas que le falten */
+            hacia: string;
+        };
+        PresupuestosInput: {
+            periodo: string;
+            /** @description Meses con gastos o con presupuesto, más el periodo abierto */
+            periodos: string[];
+            /** @description El mes que sigue a `periodo` (destino de «Copiar a…») */
+            siguiente: string;
+            /** @description Desde qué % de uso se alerta (Configuración) */
+            alertaPct: number;
+            puedeEditar: boolean;
+            /** @description Una tarjeta por estación del filtro, por código */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                activa: boolean;
+                presupuesto: string;
+                usado: string;
+                /** @description null = la estación no tiene presupuesto en el periodo */
+                pct: number | null;
+            }[];
+            /** @description Por estación y, dentro de cada una, en el orden del catálogo de categorías */
+            filas: {
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                };
+                categoria: {
+                    id: string;
+                    nombre: string;
+                };
+                presupuesto: string;
+                /** @description Aprobado o pagado */
+                ejecutado: string;
+                /** @description Por autorizar */
+                comprometido: string;
+                /** @description Ejecutado + comprometido */
+                usado: string;
+                /** @description Presupuesto − usado (negativo si se excedió) */
+                disponible: string;
+                /** @description Uso en %. null = hay gasto sin presupuesto asignado */
+                pct: number | null;
+            }[];
+            totales: {
+                presupuesto: string;
+                usado: string;
+            };
+            /** @description Para asignar presupuesto a una categoría que no lo tiene */
+            categorias: {
+                id: string;
+                nombre: string;
+                activa: boolean;
+            }[];
+        };
+        AplicarProrrateoInput: {
+            periodo: string;
+            /** @enum {string} */
+            criterio: "ventas" | "partes_iguales";
+        };
+        ProrrateoInput: {
+            periodo: string;
+            /** @description Meses con gastos, más el periodo abierto */
+            periodos: string[];
+            /**
+             * @description El criterio pedido (o el de Configuración)
+             * @enum {string}
+             */
+            criterio: "ventas" | "partes_iguales";
+            /** @enum {string} */
+            criterioPorDefecto: "ventas" | "partes_iguales";
+            /**
+             * @description El que de verdad se usa: «ventas» cae a partes iguales si no hay ventas del periodo
+             * @enum {string}
+             */
+            criterioEfectivo: "ventas" | "partes_iguales";
+            /** @description Se pidió «según ventas» y ninguna estación tiene ventas en el periodo: se reparte en partes iguales */
+            sinVentas: boolean;
+            puedeAplicar: components["schemas"]["VerificacionInput"];
+            /** @description Gastos de la oficina central del periodo que no están rechazados */
+            centrales: {
+                /** Format: uuid */
+                id: string;
+                folio: string;
+                descripcion: string;
+                monto: string;
+                estado: string;
+                repartido: boolean;
+            }[];
+            /** @description Suma de los gastos de la oficina central */
+            total: string;
+            /** @description Todos los gastos de la oficina central del periodo tienen su reparto */
+            aplicado: boolean;
+            /** @description El último prorrateo aplicado al periodo, si lo hay */
+            aplicacion: {
+                /** @enum {string} */
+                criterio: "ventas" | "partes_iguales";
+                total: string;
+                aplicadoEn: string;
+                aplicadoPor: string;
+            } | null;
+            impacto: {
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                };
+                /** @description Ventas del periodo según el ETL */
+                ventas: string;
+                /** @description Peso de la estación, de 0 a 100 */
+                pct: number;
+                /** @description Lo que le tocaría de la oficina central con el criterio elegido (el mismo cálculo con que se aplica) */
+                asignado: string;
+                /** @description Gasto propio vigente de la estación en el periodo */
+                propio: string;
+                /** @description Gasto propio + asignado */
+                conCentral: string;
+                /** @description (Gasto propio + asignado) / ventas, en %. null si no hay ventas */
+                ratioPct: number | null;
+            }[];
+        };
+        RecurrenteDatosInput: {
+            nombre: string;
+            /** Format: uuid */
+            estacionId: string;
+            /** Format: uuid */
+            centroCostoId: string;
+            categoriaId: string;
+            /** @default  */
+            subcategoria: string;
+            /**
+             * @description null = sin proveedor
+             * @default null
+             */
+            proveedorId: string | null;
+            /** @description En quetzales, como texto: "2500.00". Mayor que cero */
+            monto: string;
+            /** @enum {string} */
+            frecuencia: "Mensual" | "Bimestral" | "Trimestral" | "Semestral" | "Anual";
+            /**
+             * Format: date
+             * @description Su día queda como día de pago de la plantilla
+             */
+            proximaFecha: string;
+        };
+        RecurrenteDetalleInput: {
+            /** Format: uuid */
+            id: string;
+            /** @description RT1, RT2… */
+            codigo: string;
+            nombre: string;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            centroCosto: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            categoria: {
+                id: string;
+                nombre: string;
+            };
+            subcategoria: string;
+            proveedor: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            } | null;
+            monto: string;
+            /** @enum {string} */
+            frecuencia: "Mensual" | "Bimestral" | "Trimestral" | "Semestral" | "Anual";
+            diaPago: number;
+            proximaFecha: string;
+            activo: boolean;
+            /** @description Días que faltan para la próxima fecha (negativo: atrasada) */
+            dias: number;
+            /** @description Si el usuario puede generar su gasto ahora y, si no, por qué */
+            puedeGenerar: components["schemas"]["VerificacionInput"];
+        };
+        RecurrentesPantallaInput: {
+            /** @description Fecha del negocio con que se calculan los días */
+            hoy: string;
+            /** @description Tiene el permiso «Catálogos, proveedores, contratos y recurrentes» */
+            puedeEditar: boolean;
+            resumen: {
+                activas: number;
+                /** @description Suma en GTQ de las plantillas activas */
+                compromisoMensual: string;
+                horizonte: number;
+                /** @description Plantillas activas que tocan dentro del horizonte (o atrasadas) y que el usuario puede generar */
+                proximos: {
+                    cantidad: number;
+                    monto: string;
+                    ids: string[];
+                };
+            };
+            /** @description De la próxima fecha más cercana a la más lejana */
+            recurrentes: components["schemas"]["RecurrenteDetalleInput"][];
+            /** @description Lo que ofrece el formulario */
+            opciones: {
+                estaciones: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    activa: boolean;
+                }[];
+                centrosCosto: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    /** Format: uuid */
+                    estacionId: string;
+                    activo: boolean;
+                }[];
+                categorias: {
+                    id: string;
+                    nombre: string;
+                    activa: boolean;
+                    subcategorias: string[];
+                }[];
+                proveedores: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                    activo: boolean;
+                }[];
+                frecuencias: ("Mensual" | "Bimestral" | "Trimestral" | "Semestral" | "Anual")[];
+            };
+        };
+        Verificacion: {
+            ok: boolean;
+            /** @description Por qué no se permite (vacío si ok = true). Listo para mostrarse en un tooltip. */
+            motivo: string;
+        };
+        Paginacion: {
+            pagina: number;
+            porPagina: number;
+            total: number;
+            totalPaginas: number;
+        };
+        Problema: {
+            type: string;
+            title: string;
+            status: number;
+            /** @description Mensaje para la persona */
+            detail: string;
+            /** @description Código estable para el frontend: VALIDACION, SIN_PERMISO, TOKEN_EXPIRADO… */
+            codigo: string;
+            /** @description Errores por campo (ruta con puntos) */
+            errores: {
+                campo: string;
+                mensaje: string;
+            }[];
+            instance: string;
+            solicitudId: string;
+        };
+        DocumentoGasto: {
             /**
              * @default Sin documento
              * @enum {string}
@@ -2136,7 +7475,7 @@ export interface components {
             /** @default null */
             fechaEmision: string | null;
         };
-        NuevoGastoInput: {
+        NuevoGasto: {
             /**
              * Format: date
              * @description Fecha del gasto (no posterior a hoy)
@@ -2170,7 +7509,7 @@ export interface components {
              *       "fechaEmision": null
              *     }
              */
-            documento: components["schemas"]["DocumentoGastoInput"];
+            documento: components["schemas"]["DocumentoGasto"];
             /** @description Omitido: fecha + días de crédito del proveedor (0 sin proveedor). null: sin vencimiento */
             vencimiento?: string | null;
             /**
@@ -2179,7 +7518,7 @@ export interface components {
              */
             enviar: boolean;
         };
-        ActualizarGastoInput: {
+        ActualizarGasto: {
             /**
              * Format: date
              * @description Fecha del gasto (no posterior a hoy)
@@ -2213,7 +7552,7 @@ export interface components {
              *       "fechaEmision": null
              *     }
              */
-            documento: components["schemas"]["DocumentoGastoInput"];
+            documento: components["schemas"]["DocumentoGasto"];
             /** @description Omitido: fecha + días de crédito del proveedor (0 sin proveedor). null: sin vencimiento */
             vencimiento?: string | null;
             /**
@@ -2224,23 +7563,48 @@ export interface components {
             /** @description Versión que tenía en pantalla (bloqueo optimista) */
             version: number;
         };
-        PagoInput: {
+        Pago: {
             /** Format: date */
             fecha: string;
             metodo: string;
             referencia: string;
         };
-        /** @description Qué puede hacer el usuario con el gasto y, si no, por qué */
-        AccionesGastoInput: {
-            editar: components["schemas"]["VerificacionInput"];
-            enviar: components["schemas"]["VerificacionInput"];
-            eliminar: components["schemas"]["VerificacionInput"];
-            reabrir: components["schemas"]["VerificacionInput"];
-            aprobar: components["schemas"]["VerificacionInput"];
-            rechazar: components["schemas"]["VerificacionInput"];
-            pagar: components["schemas"]["VerificacionInput"];
+        Comprobante: {
+            /** @enum {string} */
+            tipo: "FEL" | "Recibo" | "Sin documento";
+            /** @default  */
+            serie: string;
+            /** @default  */
+            numero: string;
+            /** @default null */
+            fechaEmision: string | null;
+            /**
+             * @description Id del archivo ya subido con POST /gastos/adjuntos; null = sin archivo
+             * @default null
+             */
+            adjuntoId: string | null;
         };
-        GastoResumenInput: {
+        /** @description Foto o PDF de un comprobante. El archivo se abre en GET /gastos/adjuntos/{id} */
+        Adjunto: {
+            /** Format: uuid */
+            id: string;
+            nombre: string;
+            tipoMime: string;
+            bytes: number;
+        };
+        /** @description Qué puede hacer el usuario con el gasto y, si no, por qué */
+        AccionesGasto: {
+            editar: components["schemas"]["Verificacion"];
+            enviar: components["schemas"]["Verificacion"];
+            eliminar: components["schemas"]["Verificacion"];
+            reabrir: components["schemas"]["Verificacion"];
+            aprobar: components["schemas"]["Verificacion"];
+            rechazar: components["schemas"]["Verificacion"];
+            pagar: components["schemas"]["Verificacion"];
+            comprobante: components["schemas"]["Verificacion"];
+            verificar: components["schemas"]["Verificacion"];
+        };
+        GastoResumen: {
             /** Format: uuid */
             id: string;
             folio: string;
@@ -2295,6 +7659,14 @@ export interface components {
                 numero: string;
                 fechaEmision: string | null;
                 verificado: boolean;
+                /** @description Quién marcó la factura FEL como verificada */
+                verificadoPor: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                } | null;
+                verificadoEn: string | null;
+                adjunto: components["schemas"]["Adjunto"] | null;
             };
             vencimiento: string | null;
             solicitante: {
@@ -2306,7 +7678,7 @@ export interface components {
             nivelRequerido: string | null;
             esAjusteContable: boolean;
             faltaComprobante: boolean;
-            acciones: components["schemas"]["AccionesGastoInput"];
+            acciones: components["schemas"]["AccionesGasto"];
             pago: {
                 fecha: string;
                 metodo: string;
@@ -2323,7 +7695,7 @@ export interface components {
             creadoEn: string;
             actualizadoEn: string;
         };
-        GastoDetalleInput: {
+        GastoDetalle: {
             /** Format: uuid */
             id: string;
             folio: string;
@@ -2378,6 +7750,14 @@ export interface components {
                 numero: string;
                 fechaEmision: string | null;
                 verificado: boolean;
+                /** @description Quién marcó la factura FEL como verificada */
+                verificadoPor: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                } | null;
+                verificadoEn: string | null;
+                adjunto: components["schemas"]["Adjunto"] | null;
             };
             vencimiento: string | null;
             solicitante: {
@@ -2389,7 +7769,7 @@ export interface components {
             nivelRequerido: string | null;
             esAjusteContable: boolean;
             faltaComprobante: boolean;
-            acciones: components["schemas"]["AccionesGastoInput"];
+            acciones: components["schemas"]["AccionesGasto"];
             pago: {
                 fecha: string;
                 metodo: string;
@@ -2427,8 +7807,22 @@ export interface components {
                 detalle: string;
                 ocurridoEn: string;
             }[];
+            /** @description Reparto entre estaciones de un gasto de la oficina central (prorrateo aplicado); vacío si no tiene */
+            distribucion: {
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                };
+                /** @description Porcentaje con 2 decimales */
+                pct: string;
+                monto: string;
+            }[];
+            /** @description Nombres de quienes pueden autorizarlo ahora (solo si está pendiente) */
+            autorizadores: string[];
         };
-        CatalogosGastoInput: {
+        CatalogosGasto: {
             estaciones: {
                 /** Format: uuid */
                 id: string;
@@ -2483,13 +7877,15 @@ export interface components {
                 tasaIvaPct: string;
                 comprobanteObligatorioDesde: string;
                 monedaFuncional: string;
+                /** @description Con cuántos días de anticipación se avisa que un pago vence (Configuración) */
+                diasAlertaVencimiento: number;
             };
         };
-        InicioSesionInput: {
+        InicioSesion: {
             usuario: string;
             clave: string;
         };
-        PantallaInput: {
+        Pantalla: {
             /** @description Ruta del frontend: gastos, autorizaciones, dashboard-ventas… */
             codigo: string;
             nombre: string;
@@ -2499,7 +7895,7 @@ export interface components {
             /** @enum {string} */
             modulo: "expenses" | "dashboards" | "ingesta" | "iam" | "org" | "audit";
         };
-        PerfilInput: {
+        Perfil: {
             usuario: {
                 /** Format: uuid */
                 id: string;
@@ -2520,7 +7916,7 @@ export interface components {
                     auditoria: boolean;
                 };
                 /** @description Pantallas efectivas en el orden del menú */
-                pantallas: components["schemas"]["PantallaInput"][];
+                pantallas: components["schemas"]["Pantalla"][];
                 /** @description Permisos efectivos: registrar, aprobar, pagar, ver_todo… */
                 permisos: string[];
                 /** @description Tope para autorizar en GTQ. null = sin límite; "0.00" = no autoriza */
@@ -2543,33 +7939,145 @@ export interface components {
                 expiraEn: string | null;
                 debeCambiarClave: boolean;
             };
+            /** @description La empresa (org.empresa), para el encabezado del frontend */
+            empresa: {
+                /** @description Razón social de la empresa */
+                nombre: string;
+                /** @description Franquicia (Puma Energy…); null si no tiene */
+                franquicia: string | null;
+            };
         };
-        Verificacion: {
-            ok: boolean;
-            /** @description Por qué no se permite (vacío si ok = true). Listo para mostrarse en un tooltip. */
-            motivo: string;
+        CambioClave: {
+            actual: string;
+            nueva: string;
         };
-        Paginacion: {
-            pagina: number;
-            porPagina: number;
-            total: number;
-            totalPaginas: number;
+        NuevoHallazgo: {
+            /** @enum {string} */
+            severidad: "critica" | "alta" | "media" | "baja";
+            titulo: string;
+            /**
+             * @description Monto en riesgo, en quetzales, como texto ("1500.00"); null si no se puede valorar
+             * @default null
+             */
+            monto: string | null;
+            /** Format: uuid */
+            estacionId: string;
+            /** @default  */
+            fuente: string;
+            /** @default  */
+            detalle: string;
+            /** @default  */
+            accion: string;
+            /**
+             * Format: date
+             * @description Fecha del hallazgo (no posterior a hoy)
+             */
+            fecha: string;
         };
-        Problema: {
-            type: string;
-            title: string;
-            status: number;
-            /** @description Mensaje para la persona */
-            detail: string;
-            /** @description Código estable para el frontend: VALIDACION, SIN_PERMISO, TOKEN_EXPIRADO… */
+        GastoDeHallazgo: {
+            categoriaId: string;
+            /**
+             * @description Vacía: la primera de la categoría
+             * @default
+             */
+            subcategoria: string;
+            /**
+             * Format: uuid
+             * @description Omitido: el centro de administración de la estación del hallazgo
+             */
+            centroCostoId?: string;
+            /** @description Pérdida a registrar, en quetzales, como texto */
+            monto: string;
+            /**
+             * @description Vacía: el título del hallazgo
+             * @default
+             */
+            descripcion: string;
+        };
+        Hallazgo: {
+            /** Format: uuid */
+            id: string;
             codigo: string;
-            /** @description Errores por campo (ruta con puntos) */
-            errores: {
-                campo: string;
-                mensaje: string;
+            /** @enum {string} */
+            severidad: "critica" | "alta" | "media" | "baja";
+            titulo: string;
+            /** @description Monto en riesgo en GTQ; null si no está valorado (por ejemplo, galones) */
+            monto: string | null;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            fuente: string;
+            detalle: string;
+            accion: string;
+            /** @enum {string} */
+            estado: "abierta" | "en_revision" | "cerrada";
+            fecha: string;
+            /**
+             * @description MANUAL = lo registró una persona; ETL = salió del análisis de los reportes cargados
+             * @enum {string}
+             */
+            origen: "MANUAL" | "ETL";
+            /** @description El gasto con que se registró la pérdida, si ya se registró */
+            gasto: {
+                /** Format: uuid */
+                id: string;
+                /** @description null si el usuario no ve ese gasto */
+                folio: string | null;
+            } | null;
+            acciones: {
+                registrarGasto: components["schemas"]["Verificacion"];
+            };
+        };
+        Hallazgos: {
+            hoy: string;
+            periodoActual: string;
+            /** @description Tiene el permiso de dar seguimiento: registrar, cambiar el estado y analizar los reportes */
+            gestiona: boolean;
+            /** @description Además registra gastos: puede pasar la pérdida de un hallazgo a gasto por autorizar */
+            puedeRegistrarGasto: boolean;
+            /** @description Hallazgos sin cerrar (abiertos o en revisión) de la estación filtrada */
+            abiertos: number;
+            hallazgos: components["schemas"]["Hallazgo"][];
+            /** @description Estaciones activas que el usuario ve (para registrar un hallazgo) */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
             }[];
-            instance: string;
-            solicitudId: string;
+            /** @description Categorías activas, para registrar la pérdida como gasto */
+            categorias: {
+                id: string;
+                nombre: string;
+                subcategorias: string[];
+            }[];
+            /** @description Centros de costo activos de las estaciones que el usuario ve */
+            centros: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                /** Format: uuid */
+                estacionId: string;
+            }[];
+        };
+        AnalisisDeReportes: {
+            periodo: string;
+            creados: number;
+            /** @description Hallazgos que ya existían y cuyas cifras cambiaron */
+            actualizados: number;
+            sinCambios: number;
+            /** @description Estaciones del ETL que no están ligadas a ninguna estación del ERP: sus alertas no generan hallazgos */
+            sinEstacion: string[];
+            hallazgos: {
+                codigo: string;
+                titulo: string;
+                estacion: string;
+                nuevo: boolean;
+            }[];
         };
         CargaDeSubida: {
             /** Format: uuid */
@@ -2645,7 +8153,7 @@ export interface components {
         };
         ResumenIngesta: {
             servicio: {
-                /** @description El servicio ETL está escuchando la cola (npm run dev en etl/) */
+                /** @description El servicio ETL está escuchando la cola de subidas */
                 activo: boolean;
             };
             puedeSubir: boolean;
@@ -3098,425 +8606,1608 @@ export interface components {
                 turno: number | null;
             }[];
         };
-        DocumentoGasto: {
-            /**
-             * @default Sin documento
-             * @enum {string}
-             */
-            tipo: "FEL" | "Recibo" | "Sin documento";
-            /** @default  */
-            serie: string;
-            /** @default  */
-            numero: string;
-            /** @default null */
-            fechaEmision: string | null;
+        Alerta: {
+            /** @description Estable mientras dure la causa: pres-…, doc-…, venc-…, aut-…, caja-…, ct-…, rec-… */
+            id: string;
+            /** @enum {string} */
+            tipo: "presupuesto" | "comprobante" | "vencimiento" | "autorizacion" | "caja" | "contrato" | "recurrente";
+            /** @enum {string} */
+            severidad: "critica" | "alta" | "media" | "baja";
+            titulo: string;
+            detalle: string;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+            };
+            /** @description Pantalla donde se atiende: /presupuestos, /gastos/<id>, /caja-chica, /contratos o /recurrentes */
+            ruta: string;
+            monto: string | null;
         };
-        NuevoGasto: {
-            /**
-             * Format: date
-             * @description Fecha del gasto (no posterior a hoy)
-             */
-            fecha: string;
+        Alertas: {
+            hoy: string;
+            /** @description Mes AAAA-MM */
+            periodo: string;
+            /** @description De la más grave a la menos grave */
+            alertas: components["schemas"]["Alerta"][];
+            /** @description Cuántas hay de cada tipo */
+            conteo: {
+                [key: string]: number;
+            };
+            /** @description Los parámetros de Configuración con que se calculan */
+            parametros: {
+                alertaPresupuestoPct: number;
+                diasAlertaVencimiento: number;
+                diasAlertaPendiente: number;
+            };
+        };
+        ContadoresDelMenu: {
+            /** @description Alertas que no son de severidad baja; 0 sin la pantalla Alertas */
+            alertas: number;
+            /** @description Hallazgos sin cerrar; 0 sin la pantalla Hallazgos de reportes */
+            hallazgos: number;
+        };
+        Tablero: {
+            /** @description Mes AAAA-MM */
+            periodo: string;
+            hoy: string;
+            fechaCorte: string;
+            diasAlertaVencimiento: number;
+            puedeRegistrar: boolean;
+            vePresupuesto: boolean;
+            veAlertas: boolean;
+            veHallazgos: boolean;
+            /** @description Gasto del mes: por autorizar, aprobados y pagados */
+            total: string;
+            cantidad: number;
+            /** @description Ventas del mes de las estaciones del filtro (ETL) */
+            ventas: string;
+            /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+            pctSobreVentas: number | null;
+            /** @description null sin la pantalla Presupuestos */
+            presupuesto: {
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                usado: string;
+                /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+                pct: number | null;
+                /** @description red = excedido; amber = desde el 90 % */
+                tono: ("red" | "amber") | null;
+            } | null;
+            porAutorizar: {
+                cantidad: number;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            };
+            porPagar: {
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+                /** @description Vencen dentro de diasAlertaVencimiento (o ya vencieron) */
+                vencen: number;
+            };
+            /** @description Gastos vigentes de origen «reporte», sin las comisiones (FIN) */
+            perdidas: {
+                cantidad: number;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            };
+            porCategoria: {
+                id: string;
+                nombre: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+                pct: number;
+            }[];
+            /** @description Vacío sin la pantalla Presupuestos */
+            porEstacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                presupuesto: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                gasto: string;
+            }[];
+            /** @description Del día 1 al corte */
+            diario: {
+                fecha: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            }[];
+            alertas: {
+                total: number;
+                primeras: components["schemas"]["Alerta"][];
+            };
+            /** @description Hasta 4, primero los abiertos y más graves; vacío sin la pantalla Hallazgos */
+            hallazgos: components["schemas"]["Hallazgo"][];
+            recientes: {
+                /** Format: uuid */
+                id: string;
+                folio: string;
+                fecha: string;
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                };
+                descripcion: string;
+                /** @enum {string} */
+                estado: "borrador" | "pendiente" | "aprobado" | "rechazado" | "pagado";
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            }[];
+        };
+        Indicadores: {
+            /** @description Mes AAAA-MM */
+            periodo: string;
+            hoy: string;
+            fechaCorte: string;
+            /** @description Gasto vigente del mes, con la oficina central */
+            total: string;
+            /** @description De las estaciones (sin la oficina central) */
+            gastoSobreVentas: {
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                gasto: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                ventas: string;
+                /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+                pct: number | null;
+            };
+            perdidas: {
+                cantidad: number;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            };
+            categoriasSobrePresupuesto: number;
+            porEstacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                gasto: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                ventas: string;
+                /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+                ratioPct: number | null;
+            }[];
+            /** @description Los 6 con más gasto en el mes */
+            proveedores: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            }[];
+            /** @description Gasto por cada Q1,000 vendidos, por categoría y estación */
+            matriz: {
+                estaciones: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                }[];
+                filas: {
+                    categoria: {
+                        id: string;
+                        nombre: string;
+                    };
+                    /** @description Uno por estación, en el mismo orden */
+                    valores: {
+                        /** @description Importe en GTQ como texto decimal ("1500.00") */
+                        valor: string;
+                        mayor: boolean;
+                    }[];
+                }[];
+            };
+            desviacion: {
+                categoria: {
+                    id: string;
+                    nombre: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                presupuesto: string;
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                usado: string;
+                /** @description usado − presupuesto (puede ser negativo) */
+                diferencia: string;
+            }[];
+            inusuales: {
+                total: number;
+                lista: {
+                    /** Format: uuid */
+                    id: string;
+                    folio: string;
+                    descripcion: string;
+                    estacion: {
+                        /** Format: uuid */
+                        id: string;
+                        codigo: string;
+                    };
+                    /** @description Importe en GTQ como texto decimal ("1500.00") */
+                    monto: string;
+                    origen: string;
+                    motivo: string;
+                }[];
+            };
+        };
+        ReporteDeGastos: {
+            /** @enum {string} */
+            eje: "categoria" | "subcategoria" | "estacion" | "proveedor" | "centro" | "unidad" | "metodo" | "origen";
+            etiquetaEje: string;
+            ejes: {
+                /** @enum {string} */
+                clave: "categoria" | "subcategoria" | "estacion" | "proveedor" | "centro" | "unidad" | "metodo" | "origen";
+                etiqueta: string;
+            }[];
+            periodo: string | null;
+            /** @enum {string} */
+            estados: "vigentes" | "ejecutados" | "pagados";
+            prorrateo: boolean;
+            /** @description Meses con gastos que el usuario ve */
+            periodos: string[];
+            /** @description El mes pedido, o todos los meses con gastos */
+            columnas: string[];
+            filas: {
+                clave: string;
+                etiqueta: string;
+                /** @description Solo los meses con monto */
+                porMes: {
+                    [key: string]: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+                /** @description Parte del total del reporte */
+                pct: number;
+                registros: number;
+            }[];
+            totales: {
+                /** @description Monto por mes (clave AAAA-MM) */
+                porMes: {
+                    [key: string]: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+            };
+            /** @description Gastos del filtro (con prorrateo, uno puede repartirse en varias filas) */
+            registros: number;
+            /** @description Fecha de corte de los datos (AAAA-MM-DD): el último mes llega solo hasta este día */
+            fechaCorte: string;
+        };
+        GastosDeFranquicia: {
+            /** @description Mes AAAA-MM */
+            periodo: string;
+            hoy: string;
+            empresa: string;
+            /** @description Nombre de la franquicia (org.empresa) */
+            franquicia: string | null;
+            veRecurrentes: boolean;
+            veContratos: boolean;
+            cargosDelMes: {
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+                cantidad: number;
+            };
+            /** @description Importe en GTQ como texto decimal ("1500.00") */
+            ventas: string;
+            /** @description Porcentaje (0 a 100, puede pasar de 100); null si no hay contra qué comparar */
+            pctSobreVentas: number | null;
+            proximoCargo: {
+                /** @description Suma de las plantillas recurrentes activas de franquicia */
+                monto: string;
+                /** @description Cuándo toca la primera */
+                fecha: string | null;
+                plantillas: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    estacion: {
+                        /** Format: uuid */
+                        id: string;
+                        codigo: string;
+                    };
+                    /** @description Importe en GTQ como texto decimal ("1500.00") */
+                    monto: string;
+                    frecuencia: string;
+                    proximaFecha: string;
+                }[];
+            };
+            contratos: {
+                cantidad: number;
+                proximoVencimiento: string | null;
+                lista: {
+                    /** Format: uuid */
+                    id: string;
+                    numero: string;
+                    objeto: string;
+                    proveedor: string;
+                    estacion: {
+                        /** Format: uuid */
+                        id: string;
+                        codigo: string;
+                    };
+                    /** @description Importe en GTQ como texto decimal ("1500.00") */
+                    montoMensual: string;
+                    fin: string;
+                    diasParaVencer: number;
+                }[];
+            };
+            periodos: string[];
+            porEstacion: {
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                };
+                /** @description Monto por mes (clave AAAA-MM) */
+                porMes: {
+                    [key: string]: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+            }[];
+            totales: {
+                /** @description Monto por mes (clave AAAA-MM) */
+                porMes: {
+                    [key: string]: string;
+                };
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                total: string;
+            };
+            cargosTotal: number;
+            cargos: {
+                /** Format: uuid */
+                id: string;
+                folio: string;
+                fecha: string;
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                };
+                descripcion: string;
+                subcategoria: string;
+                /** @enum {string} */
+                estado: "borrador" | "pendiente" | "aprobado" | "rechazado" | "pagado";
+                /** @description Importe en GTQ como texto decimal ("1500.00") */
+                monto: string;
+            }[];
+        };
+        EventoBitacora: {
+            /** @description Número del evento (correlativo) */
+            id: string;
+            /** @description Cuándo ocurrió (ISO 8601, UTC) */
+            ocurridoEn: string;
+            /** @description Fecha del negocio con que se registró (AAAA-MM-DD) */
+            fechaNegocio: string | null;
+            usuario: {
+                /** @description null = proceso del sistema */
+                id: string | null;
+                nombre: string;
+            };
+            modulo: string;
+            accion: string;
+            entidad: string;
+            detalle: string;
+            /** @description Folios y números visibles que menciona el evento */
+            referencias: string[];
+        };
+        Bitacora: {
+            eventos: components["schemas"]["EventoBitacora"][];
+            paginacion: components["schemas"]["Paginacion"];
+            /** @description Lo que hay en la bitácora, para armar los filtros de la pantalla */
+            filtros: {
+                usuarios: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                }[];
+                entidades: string[];
+                acciones: string[];
+            };
+        };
+        AbrirCajaChica: {
             /** Format: uuid */
             estacionId: string;
+            /** @description Fondo fijo en quetzales, como texto: "3000.00". Mayor que cero */
+            fondo: string;
             /**
              * Format: uuid
-             * @description Debe pertenecer a la estación
+             * @description Usuario activo que maneja la caja
              */
-            centroCostoId: string;
-            categoriaId: string;
-            /** @default  */
-            subcategoria: string;
-            /** @default null */
-            proveedorId: string | null;
-            descripcion: string;
-            /** @default GTQ */
-            moneda: string;
-            /** @description Importe del documento en su moneda, como texto: "1500.00". Mayor que cero, sin más decimales que la moneda */
-            monto: string;
-            /** @description Quetzales por unidad de la moneda. Obligatorio si la moneda no es GTQ */
-            tipoCambio?: string;
-            metodoPago: string;
-            /**
-             * @default {
-             *       "tipo": "Sin documento",
-             *       "serie": "",
-             *       "numero": "",
-             *       "fechaEmision": null
-             *     }
-             */
-            documento: components["schemas"]["DocumentoGasto"];
-            /** @description Omitido: fecha + días de crédito del proveedor (0 sin proveedor). null: sin vencimiento */
-            vencimiento?: string | null;
-            /**
-             * @description true = enviar a autorización (pendiente); false = guardar como borrador
-             * @default false
-             */
-            enviar: boolean;
+            responsableId: string;
         };
-        ActualizarGasto: {
+        EditarCajaChica: {
+            /** @description Nuevo fondo fijo. No puede ser menor que lo desembolsado sin reponer */
+            fondo: string;
+            /** Format: uuid */
+            responsableId: string;
+            activa: boolean;
+        };
+        DesembolsoCaja: {
             /**
              * Format: date
-             * @description Fecha del gasto (no posterior a hoy)
+             * @description Fecha del desembolso (no posterior a hoy)
              */
             fecha: string;
-            /** Format: uuid */
-            estacionId: string;
-            /**
-             * Format: uuid
-             * @description Debe pertenecer a la estación
-             */
-            centroCostoId: string;
-            categoriaId: string;
-            /** @default  */
-            subcategoria: string;
-            /** @default null */
-            proveedorId: string | null;
             descripcion: string;
-            /** @default GTQ */
-            moneda: string;
-            /** @description Importe del documento en su moneda, como texto: "1500.00". Mayor que cero, sin más decimales que la moneda */
+            /** @description En quetzales, como texto: "125.50". Mayor que cero, hasta el tope por desembolso y el saldo de la caja */
             monto: string;
-            /** @description Quetzales por unidad de la moneda. Obligatorio si la moneda no es GTQ */
-            tipoCambio?: string;
-            metodoPago: string;
+            categoriaId: string;
             /**
-             * @default {
-             *       "tipo": "Sin documento",
-             *       "serie": "",
-             *       "numero": "",
-             *       "fechaEmision": null
-             *     }
+             * @description FEL o recibo. Obligatorio desde el monto de Configuración
+             * @default
              */
-            documento: components["schemas"]["DocumentoGasto"];
-            /** @description Omitido: fecha + días de crédito del proveedor (0 sin proveedor). null: sin vencimiento */
-            vencimiento?: string | null;
-            /**
-             * @description true = enviar a autorización (pendiente); false = guardar como borrador
-             * @default false
-             */
-            enviar: boolean;
-            /** @description Versión que tenía en pantalla (bloqueo optimista) */
-            version: number;
+            comprobante: string;
         };
-        Pago: {
-            /** Format: date */
-            fecha: string;
-            metodo: string;
-            referencia: string;
-        };
-        /** @description Qué puede hacer el usuario con el gasto y, si no, por qué */
-        AccionesGasto: {
-            editar: components["schemas"]["Verificacion"];
-            enviar: components["schemas"]["Verificacion"];
-            eliminar: components["schemas"]["Verificacion"];
-            reabrir: components["schemas"]["Verificacion"];
-            aprobar: components["schemas"]["Verificacion"];
-            rechazar: components["schemas"]["Verificacion"];
-            pagar: components["schemas"]["Verificacion"];
-        };
-        GastoResumen: {
+        CajaChica: {
             /** Format: uuid */
             id: string;
-            folio: string;
-            fecha: string;
-            /** @description AAAA-MM */
-            periodo: string;
-            /** @enum {string} */
-            estado: "borrador" | "pendiente" | "aprobado" | "rechazado" | "pagado";
-            /** @enum {string} */
-            origen: "manual" | "recurrente" | "reporte" | "caja_chica" | "compra";
-            referencia: string | null;
+            codigo: string;
             estacion: {
                 /** Format: uuid */
                 id: string;
                 codigo: string;
                 nombre: string;
             };
-            centroCosto: {
-                /** Format: uuid */
-                id: string;
-                codigo: string;
-                nombre: string;
-            };
-            categoria: {
-                id: string;
-                nombre: string;
-            };
-            subcategoria: string;
-            proveedor: {
-                /** Format: uuid */
-                id: string;
-                nombre: string;
-                nit: string;
-            } | null;
-            descripcion: string;
-            moneda: {
-                codigo: string;
-                simbolo: string;
-            };
-            /** @description Importe en la moneda del gasto, con sus decimales: "1500.00" */
-            monto: string;
-            tipoCambio: string;
-            /** @description Equivalente en GTQ (lo calcula la base) */
-            montoFuncional: string;
-            /** @description IVA incluido (FEL), en la moneda del gasto */
-            iva: string;
-            metodoPago: string;
-            documento: {
-                /** @enum {string} */
-                tipo: "FEL" | "Recibo" | "Sin documento";
-                serie: string;
-                numero: string;
-                fechaEmision: string | null;
-                verificado: boolean;
-            };
-            vencimiento: string | null;
-            solicitante: {
+            responsable: {
                 /** Format: uuid */
                 id: string;
                 nombre: string;
             };
-            /** @description Quién lo autoriza según el monto */
-            nivelRequerido: string | null;
-            esAjusteContable: boolean;
-            faltaComprobante: boolean;
-            acciones: components["schemas"]["AccionesGasto"];
-            pago: {
+            fondo: string;
+            /** @description Fondo menos los desembolsos que no se han repuesto */
+            saldo: string;
+            porLiquidar: string;
+            porLiquidarCantidad: number;
+            /** @description Liquidado y esperando autorización o pago */
+            enReposicion: string;
+            usoPct: number;
+            activa: boolean;
+            /** @description Si el usuario registra desembolsos y liquida esta caja */
+            puedeOperar: components["schemas"]["Verificacion"];
+            /** @description Del más reciente al más antiguo (los últimos 300) */
+            movimientos: {
+                /** Format: uuid */
+                id: string;
                 fecha: string;
-                metodo: string;
-                referencia: string;
+                /** @enum {string} */
+                tipo: "apertura" | "desembolso";
+                descripcion: string;
                 monto: string;
-                usuario: {
-                    /** Format: uuid */
+                categoria: {
                     id: string;
                     nombre: string;
-                };
-                registradoEn: string;
-            } | null;
-            version: number;
-            creadoEn: string;
-            actualizadoEn: string;
+                } | null;
+                comprobante: string;
+                /**
+                 * @description repuesto = su liquidación ya se pagó y el fondo volvió
+                 * @enum {string}
+                 */
+                estado: "apertura" | "por_liquidar" | "en_reposicion" | "repuesto";
+                /** @description Código de la liquidación (LIQ-CC1-1), si ya se liquidó */
+                liquidacion: string | null;
+            }[];
+            totalMovimientos: number;
         };
-        GastoDetalle: {
+        CajasChicas: {
+            hoy: string;
+            /** @description El usuario tiene el permiso de operar caja chica */
+            opera: boolean;
+            /** @description El usuario abre fondos y los cambia (permiso «Cambiar parámetros y estaciones») */
+            puedeAdministrar: boolean;
+            parametros: {
+                limiteDesembolso: string;
+                comprobanteObligatorioDesde: string;
+            };
+            cajas: components["schemas"]["CajaChica"][];
+            /** @description Donde se puede abrir un fondo (solo para quien administra) */
+            estacionesSinCaja: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            }[];
+            /** @description Usuarios activos, para elegir responsable (solo para quien administra) */
+            responsables: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            }[];
+            /** @description Categorías activas, para el desembolso */
+            categorias: {
+                id: string;
+                nombre: string;
+            }[];
+        };
+        CategoriaNueva: {
+            /** @description 2 a 6 letras o números, ej. LIM */
+            id: string;
+            nombre: string;
+            /** @default  */
+            descripcion: string;
+            /** @default  */
+            cuentaContable: string;
+            /**
+             * @description En el orden en que deben aparecer. Las que ya no vengan se quitan
+             * @default []
+             */
+            subcategorias: string[];
+            /**
+             * @description Activa = aparece al registrar gastos
+             * @default true
+             */
+            activa: boolean;
+        };
+        CategoriaEditada: {
+            nombre: string;
+            /** @default  */
+            descripcion: string;
+            /** @default  */
+            cuentaContable: string;
+            /**
+             * @description En el orden en que deben aparecer. Las que ya no vengan se quitan
+             * @default []
+             */
+            subcategorias: string[];
+            /**
+             * @description Activa = aparece al registrar gastos
+             * @default true
+             */
+            activa: boolean;
+        };
+        CentroCostoNuevo: {
+            /** Format: uuid */
+            estacionId: string;
+            unidadCodigo: string;
+            /**
+             * @description Vacío: se arma con la unidad y la estación
+             * @default
+             */
+            nombre: string;
+            /** @default true */
+            activo: boolean;
+        };
+        CentroCostoEditado: {
+            /**
+             * @description Vacío: se arma con la unidad y la estación
+             * @default
+             */
+            nombre: string;
+            /** @default true */
+            activo: boolean;
+        };
+        CatalogoCategoria: {
+            id: string;
+            nombre: string;
+            descripcion: string;
+            cuentaContable: string;
+            activa: boolean;
+            subcategorias: {
+                nombre: string;
+                /** @description Gastos del mes en esa subcategoría */
+                gastos: number;
+            }[];
+            /** @description Gastos vigentes del mes */
+            gastos: number;
+            /** @description Suma en GTQ de esos gastos */
+            monto: string;
+        };
+        CatalogoCentroCosto: {
             /** Format: uuid */
             id: string;
-            folio: string;
-            fecha: string;
-            /** @description AAAA-MM */
-            periodo: string;
-            /** @enum {string} */
-            estado: "borrador" | "pendiente" | "aprobado" | "rechazado" | "pagado";
-            /** @enum {string} */
-            origen: "manual" | "recurrente" | "reporte" | "caja_chica" | "compra";
-            referencia: string | null;
+            /** @description {estación}-{unidad} */
+            codigo: string;
+            nombre: string;
             estacion: {
                 /** Format: uuid */
                 id: string;
                 codigo: string;
                 nombre: string;
             };
-            centroCosto: {
-                /** Format: uuid */
-                id: string;
+            unidad: {
                 codigo: string;
                 nombre: string;
             };
-            categoria: {
-                id: string;
-                nombre: string;
-            };
-            subcategoria: string;
-            proveedor: {
-                /** Format: uuid */
-                id: string;
-                nombre: string;
-                nit: string;
-            } | null;
-            descripcion: string;
-            moneda: {
-                codigo: string;
-                simbolo: string;
-            };
-            /** @description Importe en la moneda del gasto, con sus decimales: "1500.00" */
+            activo: boolean;
+            gastos: number;
             monto: string;
-            tipoCambio: string;
-            /** @description Equivalente en GTQ (lo calcula la base) */
-            montoFuncional: string;
-            /** @description IVA incluido (FEL), en la moneda del gasto */
-            iva: string;
-            metodoPago: string;
-            documento: {
-                /** @enum {string} */
-                tipo: "FEL" | "Recibo" | "Sin documento";
-                serie: string;
-                numero: string;
-                fechaEmision: string | null;
-                verificado: boolean;
-            };
-            vencimiento: string | null;
-            solicitante: {
-                /** Format: uuid */
-                id: string;
-                nombre: string;
-            };
-            /** @description Quién lo autoriza según el monto */
-            nivelRequerido: string | null;
-            esAjusteContable: boolean;
-            faltaComprobante: boolean;
-            acciones: components["schemas"]["AccionesGasto"];
-            pago: {
-                fecha: string;
-                metodo: string;
-                referencia: string;
-                monto: string;
-                usuario: {
-                    /** Format: uuid */
-                    id: string;
-                    nombre: string;
-                };
-                registradoEn: string;
-            } | null;
-            version: number;
-            creadoEn: string;
-            actualizadoEn: string;
-            aprobaciones: {
-                /** Format: uuid */
-                id: string;
-                usuario: {
-                    /** Format: uuid */
-                    id: string;
-                    nombre: string;
-                };
-                /** @enum {string} */
-                accion: "aprobado" | "rechazado";
-                comentario: string;
-                fecha: string;
-                registradaEn: string;
-            }[];
-            /** @description Bitácora de auditoría de este folio, del más reciente al más antiguo */
-            historial: {
-                id: string;
-                usuario: string;
-                accion: string;
-                detalle: string;
-                ocurridoEn: string;
-            }[];
         };
-        CatalogosGasto: {
+        CatalogosPantalla: {
+            /** @description Periodo abierto (AAAA-MM): los conteos y montos son de ese mes */
+            periodo: string;
+            /** @description Tiene el permiso «Catálogos, proveedores, contratos y recurrentes» */
+            puedeEditar: boolean;
+            /** @description Todas, también las inactivas */
+            categorias: components["schemas"]["CatalogoCategoria"][];
+            /** @description De las estaciones que el usuario ve (o de la del filtro) */
+            centros: components["schemas"]["CatalogoCentroCosto"][];
+            /** @description En el orden del catálogo */
+            unidades: {
+                codigo: string;
+                nombre: string;
+                activa: boolean;
+                /** @description Gasto del mes de sus centros de costo */
+                monto: string;
+                /** @description Su parte de ese gasto entre todas las unidades, de 0 a 100: solo para dibujar la barra */
+                pct: number;
+            }[];
+            /** @description Estaciones que el usuario ve, para el formulario de centro de costo */
             estaciones: {
                 /** Format: uuid */
                 id: string;
                 codigo: string;
                 nombre: string;
-                esOficinaCentral: boolean;
+                activa: boolean;
             }[];
-            centrosCosto: {
+        };
+        RequerimientoCompra: {
+            /** Format: uuid */
+            estacionId: string;
+            /**
+             * Format: uuid
+             * @description Debe pertenecer a la estación
+             */
+            centroCostoId: string;
+            categoriaId: string;
+            descripcion: string;
+        };
+        CotizacionCompra: {
+            /** Format: uuid */
+            proveedorId: string;
+            /** @description En quetzales, como texto: "1850.00". Mayor que cero */
+            monto: string;
+            /** @default 0 */
+            diasEntrega: number;
+            /** @default  */
+            nota: string;
+        };
+        RecepcionCompra: {
+            /** @default  */
+            serie: string;
+            numero: string;
+        };
+        OrdenCompra: {
+            /** Format: uuid */
+            id: string;
+            /** @description OC-{año}-{correlativo} */
+            numero: string;
+            fecha: string;
+            /** @enum {string} */
+            estado: "requerimiento" | "cotizando" | "ordenada" | "recibida" | "cancelada";
+            estacion: {
                 /** Format: uuid */
                 id: string;
                 codigo: string;
                 nombre: string;
+            };
+            centroCosto: {
                 /** Format: uuid */
-                estacionId: string;
-                unidadCodigo: string;
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            categoria: {
+                id: string;
+                nombre: string;
+            };
+            descripcion: string;
+            solicitante: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            /** @description El de la cotización elegida */
+            proveedor: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            } | null;
+            /** @description El de la cotización elegida */
+            monto: string | null;
+            fechaOrden: string | null;
+            fechaRecepcion: string | null;
+            /** @description Quien emitió la orden */
+            aprobador: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            } | null;
+            /** @description El gasto aprobado que generó la recepción */
+            gasto: {
+                /** Format: uuid */
+                id: string;
+                folio: string;
+            } | null;
+            cotizaciones: {
+                /** Format: uuid */
+                id: string;
+                proveedor: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                };
+                monto: string;
+                diasEntrega: number;
+                nota: string;
+                /** @description La cotización con que se emitió la orden */
+                elegida: boolean;
+                /** @description La de menor monto, cuando hay más de una */
+                esMenor: boolean;
+                /** @description Quién autoriza ese monto */
+                nivelRequerido: string;
+                /** @description Si el usuario puede emitir la orden con esta cotización */
+                emitir: components["schemas"]["Verificacion"];
             }[];
+            acciones: {
+                cotizar: components["schemas"]["Verificacion"];
+                recibir: components["schemas"]["Verificacion"];
+                cancelar: components["schemas"]["Verificacion"];
+            };
+        };
+        Compras: {
+            hoy: string;
+            /** @description El usuario registra requerimientos (permiso de registrar y la pantalla Compras) */
+            puedeCrear: boolean;
+            /** @description De la más reciente a la más antigua (las últimas 200) */
+            ordenes: components["schemas"]["OrdenCompra"][];
+            /** @description Cuántas compras cumplen el filtro */
+            total: number;
+            /** @description Lo activo, para los formularios de requerimiento y de cotización */
+            catalogos: {
+                /** @description Donde el usuario puede registrar */
+                estaciones: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                }[];
+                centrosCosto: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    /** Format: uuid */
+                    estacionId: string;
+                    unidadCodigo: string;
+                }[];
+                categorias: {
+                    id: string;
+                    nombre: string;
+                }[];
+                proveedores: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                }[];
+            };
+        };
+        LimiteUsuario: {
+            /** @enum {string} */
+            modo: "ROL" | "SIN_LIMITE" | "MONTO";
+            /** @description Solo con modo MONTO: tope propio en GTQ, como texto ("1500.00") */
+            monto?: string | null;
+        };
+        NuevoUsuario: {
+            usuario: string;
+            nombre: string;
+            /**
+             * @description Opcional. Vacío o null = sin correo
+             * @default null
+             */
+            correo: string | null;
+            /** Format: uuid */
+            rolId: string;
+            /** @description org.estacion asignadas. Al menos una */
+            estaciones: string[];
+            /** @default true */
+            activo: boolean;
+            /**
+             * @description Permisos que tiene además de los de su rol
+             * @default []
+             */
+            permisosExtra: string[];
+            /**
+             * @description Permisos de su rol que se le quitan
+             * @default []
+             */
+            permisosQuitados: string[];
+            /**
+             * @description Pantallas que ve además de las de su rol
+             * @default []
+             */
+            pantallasExtra: string[];
+            /**
+             * @description Pantallas de su rol que no ve
+             * @default []
+             */
+            pantallasQuitadas: string[];
+            /**
+             * @description ROL = el de su rol; SIN_LIMITE; MONTO = tope propio
+             * @default {
+             *       "modo": "ROL"
+             *     }
+             */
+            limite: components["schemas"]["LimiteUsuario"];
+            /**
+             * @description null = como su rol; true = solo lo que registra; false = todo lo de sus estaciones
+             * @default null
+             */
+            soloPropios: boolean | null;
+            /** @description Contraseña inicial: al menos 8 caracteres */
+            clave: string;
+        };
+        EditarUsuario: {
+            usuario: string;
+            nombre: string;
+            /**
+             * @description Opcional. Vacío o null = sin correo
+             * @default null
+             */
+            correo: string | null;
+            /** Format: uuid */
+            rolId: string;
+            /** @description org.estacion asignadas. Al menos una */
+            estaciones: string[];
+            /** @default true */
+            activo: boolean;
+            /**
+             * @description Permisos que tiene además de los de su rol
+             * @default []
+             */
+            permisosExtra: string[];
+            /**
+             * @description Permisos de su rol que se le quitan
+             * @default []
+             */
+            permisosQuitados: string[];
+            /**
+             * @description Pantallas que ve además de las de su rol
+             * @default []
+             */
+            pantallasExtra: string[];
+            /**
+             * @description Pantallas de su rol que no ve
+             * @default []
+             */
+            pantallasQuitadas: string[];
+            /**
+             * @description ROL = el de su rol; SIN_LIMITE; MONTO = tope propio
+             * @default {
+             *       "modo": "ROL"
+             *     }
+             */
+            limite: components["schemas"]["LimiteUsuario"];
+            /**
+             * @description null = como su rol; true = solo lo que registra; false = todo lo de sus estaciones
+             * @default null
+             */
+            soloPropios: boolean | null;
+        };
+        RolEntrada: {
+            nombre: string;
+            /** @default  */
+            descripcion: string;
+            permisos: string[];
+            pantallas: string[];
+            /** @description Tope para autorizar en GTQ. null = sin límite; "0" = no autoriza */
+            limiteAutorizacion: string | null;
+            /**
+             * @description El rol solo ve lo que el mismo usuario registró
+             * @default false
+             */
+            soloPropios: boolean;
+        };
+        UsuarioAdministrado: {
+            /** Format: uuid */
+            id: string;
+            usuario: string;
+            nombre: string;
+            correo: string | null;
+            activo: boolean;
+            rol: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+            };
+            /** @description Estaciones asignadas */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+            }[];
+            /** @description Tiene «Ver todas las estaciones»: las asignadas aplican si se le quita ese permiso */
+            verTodo: boolean;
+            /** @description Lo que esta persona tiene distinto a su rol */
+            ajustes: {
+                permisosExtra: string[];
+                permisosQuitados: string[];
+                pantallasExtra: string[];
+                pantallasQuitadas: string[];
+                limite: {
+                    /** @enum {string} */
+                    modo: "ROL" | "SIN_LIMITE" | "MONTO";
+                    monto: string | null;
+                };
+                soloPropios: boolean | null;
+            };
+            tieneAjustes: boolean;
+            /** @description Permisos efectivos (rol + agregados − quitados) */
+            permisos: string[];
+            /** @description Pantallas efectivas, en el orden del menú */
+            pantallas: string[];
+            /** @description Tope para autorizar en GTQ: null = sin límite; "0.00" = no autoriza */
+            limiteEfectivo: string | null;
+            /** @description Alcance efectivo: solo ve lo que registra */
+            soloPropios: boolean;
+            ultimoAccesoEn: string | null;
+            /** @description Su contraseña la puso un administrador y todavía no la ha cambiado */
+            debeCambiarClave: boolean;
+            /** @description ¿Quien consulta puede administrar a este usuario? (no tiene más acceso que él) */
+            maneja: components["schemas"]["Verificacion"];
+        };
+        RolAdministrado: {
+            /** Format: uuid */
+            id: string;
+            codigo: string;
+            nombre: string;
+            descripcion: string;
+            permisos: string[];
+            pantallas: string[];
+            /** @description null = sin límite */
+            limiteAutorizacion: string | null;
+            soloPropios: boolean;
+            esSistema: boolean;
+            usuariosActivos: number;
+            /** @description Es un nivel de la política de autorización: su límite también va en Configuración */
+            esNivel: boolean;
+            /** @description ¿Quien consulta puede editar este rol? */
+            maneja: components["schemas"]["Verificacion"];
+        };
+        AdministracionUsuarios: {
+            /** @description Tiene el permiso «Administrar usuarios y roles» */
+            puedeAdministrar: boolean;
+            /** @description Largo mínimo de una contraseña nueva */
+            claveMinima: number;
+            /** @description Lo que quien consulta puede dar a otros */
+            yo: {
+                /** Format: uuid */
+                id: string;
+                permisos: string[];
+                pantallas: string[];
+            };
+            usuarios: components["schemas"]["UsuarioAdministrado"][];
+            roles: components["schemas"]["RolAdministrado"][];
+            /** @description Catálogo de permisos, en su orden */
+            permisos: {
+                codigo: string;
+                nombre: string;
+            }[];
+            /** @description Catálogo de pantallas, en el orden del menú */
+            pantallas: {
+                codigo: string;
+                nombre: string;
+                grupo: string;
+            }[];
+            /** @description Estaciones que quien consulta puede asignar */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                activa: boolean;
+            }[];
+        };
+        ConfiguracionEntrada: {
+            /** @description Versión que tenía en pantalla (bloqueo optimista) */
+            version: number;
+            /** @description Fecha con que se registran gastos, aprobaciones y pagos (AAAA-MM-DD). null = la fecha real de Guatemala */
+            fechaSistema: string | null;
+            /** @description Periodo abierto, AAAA-MM */
+            periodoActual: string;
+            /** @description Desde qué monto (GTQ) es obligatorio el comprobante */
+            comprobanteObligatorioDesde: string;
+            /** @description Tope por desembolso de caja chica (GTQ) */
+            limiteDesembolsoCaja: string;
+            /** @description Avisar cuando la ejecución del presupuesto llega a este porcentaje */
+            alertaPresupuestoPct: string;
+            diasAlertaVencimiento: number;
+            diasAlertaPendiente: number;
+            /** @enum {string} */
+            criterioProrrateo: "ventas" | "partes_iguales";
+            /** @description Comisión de tarjeta, en porcentaje ("3.5" = 3.5 %) */
+            tasaComisionTarjetaPct: string;
+            /** @description Diferencia aceptable entre lo vendido y lo medido en el tanque, en porcentaje */
+            toleranciaMermaPct: string;
+            /**
+             * @description Niveles de autorización con su tope; el que no se envía queda como está. Cambiarlos exige además «Administrar usuarios y roles»
+             * @default []
+             */
+            niveles: {
+                orden: number;
+                /** @description Autoriza hasta (GTQ). null = sin límite */
+                hasta: string | null;
+            }[];
+        };
+        Configuracion: {
+            /** @description Tiene el permiso «Cambiar parámetros y estaciones» */
+            puedeEditar: boolean;
+            /** @description Además administra usuarios y roles: puede cambiar los topes de autorización */
+            puedeEditarNiveles: boolean;
+            /** @description Se devuelve al guardar: si otra persona guardó antes, 409 */
+            version: number;
+            parametros: {
+                /** @description Hoy para el negocio: la fecha del sistema si está fijada; si no, la de Guatemala */
+                hoy: string;
+                /** @description null = se usa la fecha real */
+                fechaSistema: string | null;
+                /** @description AAAA-MM */
+                periodoActual: string;
+                /** @description Hasta qué día hay datos (solo consulta) */
+                fechaCorte: string;
+                comprobanteObligatorioDesde: string;
+                limiteDesembolsoCaja: string;
+                /** @description Porcentaje como texto decimal, sin ceros de relleno ("90") */
+                alertaPresupuestoPct: string;
+                diasAlertaVencimiento: number;
+                diasAlertaPendiente: number;
+                /** @enum {string} */
+                criterioProrrateo: "ventas" | "partes_iguales";
+                /** @description En porcentaje ("3.5" = 3.5 %) */
+                tasaComisionTarjetaPct: string;
+                toleranciaMermaPct: string;
+                /** @description Solo consulta */
+                tasaIvaPct: string;
+            };
+            niveles: {
+                orden: number;
+                /** Format: uuid */
+                rolId: string;
+                etiqueta: string;
+                /** @description null = sin límite */
+                hasta: string | null;
+                /** @description ¿Quien consulta puede cambiar este tope? Es el límite de su rol: valen las reglas de Usuarios y roles */
+                puedeCambiar: components["schemas"]["Verificacion"];
+            }[];
+        };
+        ProveedorDatos: {
+            nombre: string;
+            /**
+             * @description Vacío = «Por definir». No se puede repetir
+             * @default
+             */
+            nit: string;
+            /** @default  */
+            tipo: string;
+            /**
+             * @description Categoría principal
+             * @default null
+             */
+            categoriaId: string | null;
+            /** @default  */
+            contacto: string;
+            /** @default  */
+            telefono: string;
+            /** @default 0 */
+            diasCredito: number;
+        };
+        ProveedorDetalle: {
+            /** Format: uuid */
+            id: string;
+            /** @description P01, P02… */
+            codigo: string | null;
+            nombre: string;
+            nit: string;
+            tipo: string;
+            categoria: {
+                id: string;
+                nombre: string;
+            } | null;
+            contacto: string;
+            telefono: string;
+            diasCredito: number;
+            /** @description De qué reporte del sistema de la estación salió, si no se dio de alta a mano */
+            fuente: string | null;
+            activo: boolean;
+            /** @description Gastos del proveedor que el usuario ve */
+            gastos: number;
+            /** @description Suma en GTQ de sus gastos pagados */
+            pagado: string;
+            /** @description Suma en GTQ de sus gastos aprobados que generan pago */
+            porPagar: string;
+        };
+        ProveedoresPantalla: {
+            /** @description Tiene el permiso «Catálogos, proveedores, contratos y recurrentes» */
+            puedeEditar: boolean;
+            proveedores: components["schemas"]["ProveedorDetalle"][];
+            /** @description Para elegir la categoría principal */
             categorias: {
                 id: string;
                 nombre: string;
-                cuentaContable: string;
-                subcategorias: string[];
+                activa: boolean;
             }[];
-            proveedores: {
+        };
+        ContratoDatos: {
+            objeto: string;
+            /** Format: uuid */
+            proveedorId: string;
+            /** Format: uuid */
+            estacionId: string;
+            categoriaId: string;
+            /** @description En quetzales, como texto: "4500.00". Puede ser 0 */
+            montoMensual: string;
+            /** Format: date */
+            inicio: string;
+            /**
+             * Format: date
+             * @description Posterior al inicio
+             */
+            fin: string;
+            /** @default false */
+            renovacionAutomatica: boolean;
+            /** @default 30 */
+            avisoDias: number;
+            /**
+             * @description Nombre del archivo o ubicación física. Vacío = «Pendiente de digitalizar»
+             * @default
+             */
+            documento: string;
+        };
+        ContratoDetalle: {
+            /** Format: uuid */
+            id: string;
+            /** @description CT-001 */
+            numero: string;
+            objeto: string;
+            proveedor: {
                 /** Format: uuid */
                 id: string;
-                codigo: string | null;
                 nombre: string;
-                nit: string;
-                categoriaId: string | null;
-                diasCredito: number;
-            }[];
-            metodosPago: {
-                codigo: string;
-                esAjuste: boolean;
-                paraPago: boolean;
-            }[];
-            monedas: {
+            };
+            estacion: {
+                /** Format: uuid */
+                id: string;
                 codigo: string;
                 nombre: string;
-                simbolo: string;
-                decimales: number;
-                esFuncional: boolean;
-            }[];
-            niveles: {
-                orden: number;
-                etiqueta: string;
-                hasta: string | null;
-            }[];
-            parametros: {
-                hoy: string;
-                periodoActual: string;
-                tasaIvaPct: string;
-                comprobanteObligatorioDesde: string;
-                monedaFuncional: string;
+            };
+            categoria: {
+                id: string;
+                nombre: string;
+            };
+            montoMensual: string;
+            inicio: string;
+            fin: string;
+            renovacionAutomatica: boolean;
+            avisoDias: number;
+            documento: string;
+            /** @description Días que faltan para que venza (negativo: días que lleva vencido) */
+            dias: number;
+            /** @enum {string} */
+            estado: "Vencido" | "Por vencer" | "Vigente";
+            /** @description Vence dentro de su plazo de aviso (o ya venció) y no se renueva solo */
+            porVencer: boolean;
+            /** @description No está vigente: quien renueva contratos puede extenderlo */
+            renovable: boolean;
+        };
+        ContratosPantalla: {
+            /** @description Fecha del negocio con que se calculan los días */
+            hoy: string;
+            /** @description Tiene el permiso «Catálogos, proveedores, contratos y recurrentes» */
+            puedeEditar: boolean;
+            /** @description Autoriza y ve todas las estaciones (administración central) */
+            puedeRenovar: boolean;
+            resumen: {
+                contratos: number;
+                compromisoMensual: string;
+                /** @description Por vencer sin renovación automática */
+                porVencer: number;
+                renovacionAutomatica: number;
+            };
+            /** @description Del que vence primero al que vence último */
+            contratos: components["schemas"]["ContratoDetalle"][];
+            /** @description Lo que ofrece el formulario */
+            opciones: {
+                estaciones: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    activa: boolean;
+                }[];
+                proveedores: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                    activo: boolean;
+                }[];
+                categorias: {
+                    id: string;
+                    nombre: string;
+                    activa: boolean;
+                }[];
             };
         };
-        InicioSesion: {
-            usuario: string;
-            clave: string;
-        };
-        Pantalla: {
-            /** @description Ruta del frontend: gastos, autorizaciones, dashboard-ventas… */
+        NuevaEstacion: {
             codigo: string;
             nombre: string;
-            /** @description Grupo del menú */
-            grupo: string;
-            orden: number;
-            /** @enum {string} */
-            modulo: "expenses" | "dashboards" | "ingesta" | "iam" | "org" | "audit";
+            /** @default  */
+            direccion: string;
+            /**
+             * @description Responsable de la estación (iam.usuario). null = sin responsable
+             * @default null
+             */
+            gerenteId: string | null;
+            /** @description Unidades de negocio (org.unidad_negocio): se crea un centro de costo por cada una */
+            unidades: string[];
+            /**
+             * @description Código de la estación en el ETL: la liga con sus ventas y turnos. null o vacío = sin datos operativos
+             * @default null
+             */
+            codigoEtl: string | null;
+            /**
+             * @description Fondo de caja chica en GTQ, como texto. "0" = sin caja chica
+             * @default 0
+             */
+            fondoCaja: string;
         };
-        Perfil: {
-            usuario: {
+        EditarEstacion: {
+            nombre: string;
+            /** @default  */
+            direccion: string;
+            /**
+             * @description Responsable de la estación (iam.usuario). null = sin responsable
+             * @default null
+             */
+            gerenteId: string | null;
+            /** @description Unidades de negocio (org.unidad_negocio): se crea un centro de costo por cada una */
+            unidades: string[];
+            /**
+             * @description Código de la estación en el ETL: la liga con sus ventas y turnos. null o vacío = sin datos operativos
+             * @default null
+             */
+            codigoEtl: string | null;
+            activa: boolean;
+        };
+        EmpresaEntrada: {
+            nombre: string;
+            /** @default  */
+            nit: string;
+            /** @default null */
+            franquicia: string | null;
+        };
+        Empresa: {
+            nombre: string;
+            nit: string;
+            franquicia: string | null;
+            moneda: string;
+        };
+        EstacionAdministrada: {
+            /** Format: uuid */
+            id: string;
+            codigo: string;
+            nombre: string;
+            direccion: string;
+            gerente: {
                 /** Format: uuid */
                 id: string;
-                usuario: string;
                 nombre: string;
-                correo: string | null;
-                rol: {
+            } | null;
+            unidades: {
+                codigo: string;
+                nombre: string;
+            }[];
+            esOficinaCentral: boolean;
+            codigoEtl: string | null;
+            demo: boolean;
+            activa: boolean;
+            /** @description Gasto del periodo abierto (por autorizar, aprobado y pagado), en GTQ */
+            gastoMes: string;
+            /** @description Ventas del periodo según el ETL. null = no aplica (sin código en el ETL o sin ventas) */
+            ventasMes: string | null;
+            /** @description Gasto sobre ventas, en porcentaje. null si no hay ventas */
+            ratioPct: number | null;
+            /** @description Centros de costo de la estación */
+            centros: number;
+            /** @description Del primer al último turno cargado en el ETL */
+            turnos: {
+                min: number;
+                max: number;
+            } | null;
+            /** @description Su caja chica, si tiene */
+            caja: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                fondo: string;
+                activa: boolean;
+            } | null;
+        };
+        EmpresaYEstaciones: {
+            /** @description Tiene el permiso «Cambiar parámetros y estaciones» */
+            puedeEditar: boolean;
+            /** @description Crear una estación exige además ver todas las estaciones */
+            puedeCrear: components["schemas"]["Verificacion"];
+            /** @description Periodo abierto (AAAA-MM): el del gasto y las ventas del mes */
+            periodo: string;
+            fechaCorte: string;
+            empresa: components["schemas"]["Empresa"];
+            /** @description Solo las estaciones que el usuario ve */
+            estaciones: components["schemas"]["EstacionAdministrada"][];
+            /** @description Catálogo de unidades de negocio */
+            unidades: {
+                codigo: string;
+                nombre: string;
+            }[];
+            /** @description Usuarios activos, para elegir al responsable (solo si puede editar) */
+            usuarios: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            }[];
+            /** @description Estaciones que existen en el ETL y a cuál del ERP está ligada cada una */
+            estacionesEtl: {
+                codigo: string;
+                nombre: string;
+                estacionId: string | null;
+            }[];
+        };
+        /** @description Las preferencias del usuario: clave → valor (texto corto cuyo significado da la clave) */
+        Preferencias: {
+            [key: string]: string;
+        };
+        LineaPresupuesto: {
+            periodo: string;
+            /** Format: uuid */
+            estacionId: string;
+            categoriaId: string;
+            /** @description Presupuesto mensual en quetzales, como texto: "5000.00". Cero o más, hasta 2 decimales */
+            monto: string;
+        };
+        CopiarPresupuestos: {
+            /** @description Mes de origen */
+            desde: string;
+            /** @description Mes de destino: recibe las líneas que le falten */
+            hacia: string;
+        };
+        Presupuestos: {
+            periodo: string;
+            /** @description Meses con gastos o con presupuesto, más el periodo abierto */
+            periodos: string[];
+            /** @description El mes que sigue a `periodo` (destino de «Copiar a…») */
+            siguiente: string;
+            /** @description Desde qué % de uso se alerta (Configuración) */
+            alertaPct: number;
+            puedeEditar: boolean;
+            /** @description Una tarjeta por estación del filtro, por código */
+            estaciones: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
+                activa: boolean;
+                presupuesto: string;
+                usado: string;
+                /** @description null = la estación no tiene presupuesto en el periodo */
+                pct: number | null;
+            }[];
+            /** @description Por estación y, dentro de cada una, en el orden del catálogo de categorías */
+            filas: {
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                };
+                categoria: {
+                    id: string;
+                    nombre: string;
+                };
+                presupuesto: string;
+                /** @description Aprobado o pagado */
+                ejecutado: string;
+                /** @description Por autorizar */
+                comprometido: string;
+                /** @description Ejecutado + comprometido */
+                usado: string;
+                /** @description Presupuesto − usado (negativo si se excedió) */
+                disponible: string;
+                /** @description Uso en %. null = hay gasto sin presupuesto asignado */
+                pct: number | null;
+            }[];
+            totales: {
+                presupuesto: string;
+                usado: string;
+            };
+            /** @description Para asignar presupuesto a una categoría que no lo tiene */
+            categorias: {
+                id: string;
+                nombre: string;
+                activa: boolean;
+            }[];
+        };
+        AplicarProrrateo: {
+            periodo: string;
+            /** @enum {string} */
+            criterio: "ventas" | "partes_iguales";
+        };
+        Prorrateo: {
+            periodo: string;
+            /** @description Meses con gastos, más el periodo abierto */
+            periodos: string[];
+            /**
+             * @description El criterio pedido (o el de Configuración)
+             * @enum {string}
+             */
+            criterio: "ventas" | "partes_iguales";
+            /** @enum {string} */
+            criterioPorDefecto: "ventas" | "partes_iguales";
+            /**
+             * @description El que de verdad se usa: «ventas» cae a partes iguales si no hay ventas del periodo
+             * @enum {string}
+             */
+            criterioEfectivo: "ventas" | "partes_iguales";
+            /** @description Se pidió «según ventas» y ninguna estación tiene ventas en el periodo: se reparte en partes iguales */
+            sinVentas: boolean;
+            puedeAplicar: components["schemas"]["Verificacion"];
+            /** @description Gastos de la oficina central del periodo que no están rechazados */
+            centrales: {
+                /** Format: uuid */
+                id: string;
+                folio: string;
+                descripcion: string;
+                monto: string;
+                estado: string;
+                repartido: boolean;
+            }[];
+            /** @description Suma de los gastos de la oficina central */
+            total: string;
+            /** @description Todos los gastos de la oficina central del periodo tienen su reparto */
+            aplicado: boolean;
+            /** @description El último prorrateo aplicado al periodo, si lo hay */
+            aplicacion: {
+                /** @enum {string} */
+                criterio: "ventas" | "partes_iguales";
+                total: string;
+                aplicadoEn: string;
+                aplicadoPor: string;
+            } | null;
+            impacto: {
+                estacion: {
+                    /** Format: uuid */
+                    id: string;
                     codigo: string;
                     nombre: string;
                 };
+                /** @description Ventas del periodo según el ETL */
+                ventas: string;
+                /** @description Peso de la estación, de 0 a 100 */
+                pct: number;
+                /** @description Lo que le tocaría de la oficina central con el criterio elegido (el mismo cálculo con que se aplica) */
+                asignado: string;
+                /** @description Gasto propio vigente de la estación en el periodo */
+                propio: string;
+                /** @description Gasto propio + asignado */
+                conCentral: string;
+                /** @description (Gasto propio + asignado) / ventas, en %. null si no hay ventas */
+                ratioPct: number | null;
+            }[];
+        };
+        RecurrenteDatos: {
+            nombre: string;
+            /** Format: uuid */
+            estacionId: string;
+            /** Format: uuid */
+            centroCostoId: string;
+            categoriaId: string;
+            /** @default  */
+            subcategoria: string;
+            /**
+             * @description null = sin proveedor
+             * @default null
+             */
+            proveedorId: string | null;
+            /** @description En quetzales, como texto: "2500.00". Mayor que cero */
+            monto: string;
+            /** @enum {string} */
+            frecuencia: "Mensual" | "Bimestral" | "Trimestral" | "Semestral" | "Anual";
+            /**
+             * Format: date
+             * @description Su día queda como día de pago de la plantilla
+             */
+            proximaFecha: string;
+        };
+        RecurrenteDetalle: {
+            /** Format: uuid */
+            id: string;
+            /** @description RT1, RT2… */
+            codigo: string;
+            nombre: string;
+            estacion: {
+                /** Format: uuid */
+                id: string;
+                codigo: string;
+                nombre: string;
             };
-            acceso: {
-                /** @description ¿A qué módulos del frontend entra? Base para proteger rutas en Next.js */
-                modulos: {
-                    gastos: boolean;
-                    dashboards: boolean;
-                    administracion: boolean;
-                    auditoria: boolean;
-                };
-                /** @description Pantallas efectivas en el orden del menú */
-                pantallas: components["schemas"]["Pantalla"][];
-                /** @description Permisos efectivos: registrar, aprobar, pagar, ver_todo… */
-                permisos: string[];
-                /** @description Tope para autorizar en GTQ. null = sin límite; "0.00" = no autoriza */
-                limiteAutorizacion: string | null;
-                alcance: {
-                    verTodo: boolean;
-                    soloPropios: boolean;
-                    estaciones: {
-                        /** Format: uuid */
-                        id: string;
-                        codigo: string;
-                        nombre: string;
-                        esOficinaCentral: boolean;
-                        activa: boolean;
-                    }[];
+            centroCosto: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            };
+            categoria: {
+                id: string;
+                nombre: string;
+            };
+            subcategoria: string;
+            proveedor: {
+                /** Format: uuid */
+                id: string;
+                nombre: string;
+            } | null;
+            monto: string;
+            /** @enum {string} */
+            frecuencia: "Mensual" | "Bimestral" | "Trimestral" | "Semestral" | "Anual";
+            diaPago: number;
+            proximaFecha: string;
+            activo: boolean;
+            /** @description Días que faltan para la próxima fecha (negativo: atrasada) */
+            dias: number;
+            /** @description Si el usuario puede generar su gasto ahora y, si no, por qué */
+            puedeGenerar: components["schemas"]["Verificacion"];
+        };
+        RecurrentesPantalla: {
+            /** @description Fecha del negocio con que se calculan los días */
+            hoy: string;
+            /** @description Tiene el permiso «Catálogos, proveedores, contratos y recurrentes» */
+            puedeEditar: boolean;
+            resumen: {
+                activas: number;
+                /** @description Suma en GTQ de las plantillas activas */
+                compromisoMensual: string;
+                horizonte: number;
+                /** @description Plantillas activas que tocan dentro del horizonte (o atrasadas) y que el usuario puede generar */
+                proximos: {
+                    cantidad: number;
+                    monto: string;
+                    ids: string[];
                 };
             };
-            sesion: {
-                /** @description Vencimiento del token de acceso (ISO 8601) */
-                expiraEn: string | null;
-                debeCambiarClave: boolean;
+            /** @description De la próxima fecha más cercana a la más lejana */
+            recurrentes: components["schemas"]["RecurrenteDetalle"][];
+            /** @description Lo que ofrece el formulario */
+            opciones: {
+                estaciones: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    activa: boolean;
+                }[];
+                centrosCosto: {
+                    /** Format: uuid */
+                    id: string;
+                    codigo: string;
+                    nombre: string;
+                    /** Format: uuid */
+                    estacionId: string;
+                    activo: boolean;
+                }[];
+                categorias: {
+                    id: string;
+                    nombre: string;
+                    activa: boolean;
+                    subcategorias: string[];
+                }[];
+                proveedores: {
+                    /** Format: uuid */
+                    id: string;
+                    nombre: string;
+                    activo: boolean;
+                }[];
+                frecuencias: ("Mensual" | "Bimestral" | "Trimestral" | "Semestral" | "Anual")[];
             };
         };
     };

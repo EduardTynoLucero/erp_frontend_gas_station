@@ -15,6 +15,7 @@ import { useTienePantalla } from '@/componentes/marco/contexto';
 import { Aviso, EsqueletoTabla } from '@/componentes/ui/aviso';
 import { BotonAccion } from '@/componentes/ui/boton';
 import { Insignia, type Tono } from '@/componentes/ui/insignia';
+import { COMO_ENCENDER_ETL } from '@/lib/entorno';
 import { fechaHora, num, q } from '@/lib/formato';
 import { cn } from '@/lib/utilidades';
 import { ordenarProductos } from '@/modulos/dashboards/productos';
@@ -337,8 +338,7 @@ export function TarjetaSubida({ s, servicioActivo, abiertaAlInicio }: { s: Subid
 
         {s.estado === 'PENDIENTE' && !servicioActivo && (
           <Aviso tono="amber">
-            El servicio ETL no está encendido: el archivo espera en la cola y se revisa en cuanto se encienda (en una terminal, en la carpeta
-            etl: <code className="font-mono text-xs">npm run dev</code>).
+            El servicio ETL no está encendido: el archivo espera en la cola y se revisa en cuanto se encienda. {COMO_ENCENDER_ETL}
           </Aviso>
         )}
         {s.estado === 'FALLIDA' && s.error && <Aviso tono="red">{s.error}</Aviso>}

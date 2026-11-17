@@ -9,10 +9,10 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import type { Perfil } from '@/api/tipos';
 import { claseEntrada } from '@/componentes/ui/campos';
-import { EMPRESA } from '@/lib/marca';
 import { BarraLateral } from './barra-lateral';
 import { ProveedorErp, TODAS, useErp } from './contexto';
 import { MenuUsuario } from './menu-usuario';
+import { ProveedorPreferencias } from './preferencias';
 import { BOTON_ENCABEZADO, BotonTema } from './tema';
 
 function BarraCarga() {
@@ -83,6 +83,8 @@ function useAvisoDenegado(ruta: string) {
 function Contenido({ children }: { children: ReactNode }) {
   const [abierto, setAbierto] = useState(false);
   const ruta = usePathname();
+  // El nombre de la empresa viene de la base (org.empresa), en el perfil; se cambia en la pantalla Estaciones
+  const { perfil } = useErp();
   useEffect(() => {
     setAbierto(false);
     window.scrollTo(0, 0);
@@ -115,7 +117,7 @@ function Contenido({ children }: { children: ReactNode }) {
             <button type="button" onClick={() => setAbierto(true)} aria-label="Abrir menú" className={`${BOTON_ENCABEZADO} lg:hidden`}>
               <IconoMenu className="size-[16px]" />
             </button>
-            <div className="mr-auto min-w-0 truncate text-[13px] font-semibold text-tinta">{EMPRESA}</div>
+            <div className="mr-auto min-w-0 truncate text-[13px] font-semibold text-tinta">{perfil.empresa.nombre}</div>
             <FiltroEstacion />
             <BotonTema />
             <MenuUsuario />
@@ -130,10 +132,13 @@ function Contenido({ children }: { children: ReactNode }) {
   );
 }
 
-export function Marco({ perfil, children }: { perfil: Perfil; children: ReactNode }) {
+/** `preferencias`: las del usuario leídas en el servidor (null si no se pudieron leer: el navegador las pide al montar) */
+export function Marco({ perfil, preferencias, children }: { perfil: Perfil; preferencias: Record<string, string> | null; children: ReactNode }) {
   return (
-    <ProveedorErp perfil={perfil}>
-      <Contenido>{children}</Contenido>
-    </ProveedorErp>
+    <ProveedorPreferencias iniciales={preferencias}>
+      <ProveedorErp perfil={perfil}>
+        <Contenido>{children}</Contenido>
+      </ProveedorErp>
+    </ProveedorPreferencias>
   );
 }

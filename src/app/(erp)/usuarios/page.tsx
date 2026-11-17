@@ -1,0 +1,7 @@
+import { PantallaUsuarios } from '@/modulos/usuarios/pantallas/usuarios';
+
+export const metadata = { title: 'Usuarios y roles' };
+
+export default function PaginaUsuarios() {
+  return <PantallaUsuarios />;
+}

@@ -6,8 +6,8 @@
  * enseguida con lo que diga el backend.
  */
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, pedir } from '@/api/cliente';
-import type { ConsultaGastos, CuerpoActualizarGasto, CuerpoGasto, CuerpoPago, GastoDetalle } from '@/api/tipos';
+import { api, ErrorApi, type ErrorCampo, irAlInicioDeSesion, MENSAJE_SIN_CONEXION, pedir, renovarSesion } from '@/api/cliente';
+import type { components, ConsultaGastos, CuerpoActualizarGasto, CuerpoGasto, CuerpoPago, GastoDetalle, paths } from '@/api/tipos';
 
 export const clavesGastos = {
   todo: ['gastos'] as const,
@@ -94,12 +94,76 @@ export function useEliminarGasto() {
   });
 }
 
+export type CuerpoComprobante = paths['/api/v1/gastos/{id}/comprobante']['post']['requestBody']['content']['application/json'];
+export type Adjunto = components['schemas']['Adjunto'];
+
 export type AccionFlujo =
   | { tipo: 'enviar'; id: string }
   | { tipo: 'reabrir'; id: string }
   | { tipo: 'aprobar'; id: string; comentario?: string }
   | { tipo: 'rechazar'; id: string; comentario: string }
-  | { tipo: 'pagar'; id: string; pago: CuerpoPago };
+  | { tipo: 'pagar'; id: string; pago: CuerpoPago }
+  | { tipo: 'comprobante'; id: string; comprobante: CuerpoComprobante }
+  | { tipo: 'verificar'; id: string };
+
+/** Dirección del archivo de un comprobante (lo sirve el backend; el navegador lo abre con su sesión) */
+export const urlAdjunto = (id: string) => `/api/v1/gastos/adjuntos/${encodeURIComponent(id)}`;
+
+/** Tipos de archivo que acepta un comprobante, y su tope (los mismos del backend) */
+export const TIPOS_ADJUNTO = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic'];
+export const MAX_BYTES_ADJUNTO = 5 * 1024 * 1024;
+
+interface Problema {
+  detail?: string;
+  codigo?: string;
+  errores?: ErrorCampo[];
+  solicitudId?: string;
+}
+
+/** fetch con la misma renovación de sesión del cliente de la API: si el token venció, renueva una vez y repite */
+async function conSesion(pedido: () => Promise<Response>): Promise<Response> {
+  let respuesta: Response;
+  try {
+    respuesta = await pedido();
+    if (respuesta.status === 401 && (await renovarSesion())) respuesta = await pedido();
+  } catch {
+    throw new ErrorApi(0, 'SIN_CONEXION', MENSAJE_SIN_CONEXION);
+  }
+  if (respuesta.status === 401) {
+    irAlInicioDeSesion();
+    throw new ErrorApi(401, 'SESION_VENCIDA', 'Su sesión terminó. Inicie sesión de nuevo.');
+  }
+  return respuesta;
+}
+
+async function problema(respuesta: Response, porDefecto: string): Promise<ErrorApi> {
+  const p = ((await respuesta.json().catch(() => null)) ?? {}) as Problema;
+  return new ErrorApi(respuesta.status, p.codigo ?? 'ERROR', p.detail ?? `${porDefecto} (HTTP ${respuesta.status}).`, p.errores ?? [], p.solicitudId);
+}
+
+/**
+ * Sube la foto o el PDF de un comprobante: el archivo va tal cual en el cuerpo, con su tipo y su nombre. Se guarda en
+ * la base y devuelve su ficha; el id se manda después con el comprobante del gasto.
+ */
+export async function subirAdjunto(archivo: File): Promise<Adjunto> {
+  if (!TIPOS_ADJUNTO.includes(archivo.type)) throw new ErrorApi(422, 'ADJUNTO_INVALIDO', 'Solo se aceptan fotos (JPG, PNG, WEBP, GIF, HEIC) o PDF.');
+  if (archivo.size > MAX_BYTES_ADJUNTO) throw new ErrorApi(422, 'ADJUNTO_INVALIDO', 'El adjunto no puede pasar de 5 MB.');
+  const respuesta = await conSesion(() =>
+    fetch('/api/v1/gastos/adjuntos', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'content-type': archivo.type, 'x-archivo-nombre': encodeURIComponent(archivo.name) },
+      body: archivo,
+    }),
+  );
+  if (!respuesta.ok) throw await problema(respuesta, 'No se pudo subir el archivo');
+  return ((await respuesta.json()) as { data: Adjunto }).data;
+}
+
+/** Quita un archivo que se subió y al final no se usó (se cerró el diálogo o se eligió otro) */
+export async function quitarAdjunto(id: string): Promise<void> {
+  await pedir(api.DELETE('/api/v1/gastos/adjuntos/{adjuntoId}', { params: { path: { adjuntoId: id } } })).catch(() => undefined);
+}
 
 /** Acciones del flujo de autorización y pago. Devuelve el gasto actualizado y el mensaje del backend. */
 export function useAccionGasto() {
@@ -118,6 +182,10 @@ export function useAccionGasto() {
           return pedir(api.POST('/api/v1/gastos/{id}/rechazar', { params: { path }, body: { comentario: a.comentario } }));
         case 'pagar':
           return pedir(api.POST('/api/v1/gastos/{id}/pagar', { params: { path }, body: a.pago }));
+        case 'comprobante':
+          return pedir(api.POST('/api/v1/gastos/{id}/comprobante', { params: { path }, body: a.comprobante }));
+        case 'verificar':
+          return pedir(api.POST('/api/v1/gastos/{id}/verificar', { params: { path } }));
       }
     },
     onSuccess: (r) => invalidar(r.data),

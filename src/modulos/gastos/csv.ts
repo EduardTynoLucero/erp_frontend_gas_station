@@ -1,14 +1,11 @@
 'use client';
 
-/** Exporta a CSV todos los gastos del filtro (no solo la página visible), como el prototipo. */
+/** Exporta a CSV todos los gastos del filtro (no solo la página visible), como el diseño original. */
 import { api, pedir } from '@/api/cliente';
 import type { ConsultaGastos, GastoResumen } from '@/api/tipos';
 import { ESTADOS } from '@/componentes/ui/insignia';
+import { descargarCsv } from '@/lib/csv';
 import { nombreProveedor, ORIGEN_CORTO } from './etiquetas';
-
-function celda(v: string): string {
-  return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
-}
 
 export async function exportarCsv(consulta: Omit<ConsultaGastos, 'pagina' | 'porPagina'>): Promise<number> {
   const filas: GastoResumen[] = [];
@@ -17,9 +14,9 @@ export async function exportarCsv(consulta: Omit<ConsultaGastos, 'pagina' | 'por
     filas.push(...r.data);
     if (pagina >= r.paginacion.totalPaginas) break;
   }
-  const encabezado = ['Folio', 'Fecha', 'Estación', 'Centro de costo', 'Categoría', 'Subcategoría', 'Proveedor', 'Descripción', 'Documento', 'Estado', 'Origen', 'Moneda', 'Monto', 'IVA', 'Monto GTQ'];
-  const lineas = filas.map((g) =>
-    [
+  descargarCsv('gastos.csv', [
+    ['Folio', 'Fecha', 'Estación', 'Centro de costo', 'Categoría', 'Subcategoría', 'Proveedor', 'Descripción', 'Documento', 'Estado', 'Origen', 'Moneda', 'Monto', 'IVA', 'Monto GTQ'],
+    ...filas.map((g) => [
       g.folio,
       g.fecha,
       g.estacion.codigo,
@@ -35,16 +32,7 @@ export async function exportarCsv(consulta: Omit<ConsultaGastos, 'pagina' | 'por
       g.monto,
       g.iva,
       g.montoFuncional,
-    ]
-      .map((v) => celda(String(v)))
-      .join(','),
-  );
-  const contenido = `﻿${[encabezado.join(','), ...lineas].join('\r\n')}`;
-  const url = URL.createObjectURL(new Blob([contenido], { type: 'text/csv;charset=utf-8' }));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'gastos.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+    ]),
+  ]);
   return filas.length;
 }

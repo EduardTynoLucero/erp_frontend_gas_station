@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Modo oscuro por clase (next-themes pone `dark` en <html>): las clases dark: de Tailwind se activan con ella. */
+/* Modo oscuro por clase (el tema pone `dark` en <html>, ver lib/tema): las clases dark: de Tailwind se activan con ella. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*

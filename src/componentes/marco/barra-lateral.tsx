@@ -33,16 +33,19 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { api, pedir } from '@/api/cliente';
 import type { Pantalla } from '@/api/tipos';
 import { fecha } from '@/lib/formato';
-import { FRANQUICIA, NOMBRE_APP, VERSION } from '@/lib/marca';
+import { NOMBRE_APP, VERSION } from '@/lib/marca';
 import { RUTA_DE_PANTALLA } from '@/lib/rutas';
 import { cn } from '@/lib/utilidades';
 import { useCatalogos, useListaGastos } from '@/modulos/gastos/datos';
 import { useErp } from './contexto';
+import { usePreferencia } from './preferencias';
 
 const ICONOS: Record<string, LucideIcon> = {
   'mis-solicitudes': Inbox,
@@ -111,83 +114,58 @@ function opcionesPorModulo(pantallas: Pantalla[]): Record<ClaveModulo, Opcion[]>
   return salida;
 }
 
-/** Qué módulos están abiertos (se recuerda por usuario en este navegador) */
-function useModulosAbiertos(usuarioId: string, activo: ClaveModulo | null) {
-  const clave = `erp:menu:${usuarioId}`;
-  const [abiertos, setAbiertos] = useState<Record<ClaveModulo, boolean>>({ Dashboards: true, Gastos: true });
-  useEffect(() => {
-    try {
-      const guardado = JSON.parse(localStorage.getItem(clave) ?? 'null') as Partial<Record<ClaveModulo, boolean>> | null;
-      if (guardado) setAbiertos((a) => ({ ...a, ...guardado }));
-    } catch {
-      // sin almacenamiento: los dos abiertos
-    }
-  }, [clave]);
-  // El módulo de la página abierta siempre se ve
-  useEffect(() => {
-    if (activo) setAbiertos((a) => (a[activo] ? a : { ...a, [activo]: true }));
-  }, [activo]);
-  const alternar = (m: ClaveModulo) =>
-    setAbiertos((a) => {
-      const nuevo = { ...a, [m]: !a[m] };
-      try {
-        localStorage.setItem(clave, JSON.stringify(nuevo));
-      } catch {
-        // sin almacenamiento: vale hasta recargar
-      }
-      return nuevo;
-    });
+/**
+ * Qué módulos del menú están abiertos. Es una preferencia del usuario guardada en la base (clave «menu»: los módulos
+ * que dejó cerrados, separados por coma); no se guarda nada en el navegador.
+ */
+function useModulosAbiertos(activo: ClaveModulo | null) {
+  const [cerrados, fijarCerrados] = usePreferencia('menu', '');
+  const lista = cerrados.split(',').filter(Boolean);
+  // El módulo de la página abierta se ve aunque estuviera cerrado; se puede volver a cerrar hasta cambiar de página
+  const [forzado, setForzado] = useState<ClaveModulo | null>(activo);
+  useEffect(() => setForzado(activo), [activo]);
+  const abiertos: Record<ClaveModulo, boolean> = {
+    Dashboards: forzado === 'Dashboards' || !lista.includes('Dashboards'),
+    Gastos: forzado === 'Gastos' || !lista.includes('Gastos'),
+  };
+  const alternar = (m: ClaveModulo) => {
+    const cerrar = abiertos[m];
+    if (cerrar && forzado === m) setForzado(null);
+    const nuevos = MODULOS.map((x) => x.clave).filter((clave) => (clave === m ? cerrar : lista.includes(clave)));
+    fijarCerrados(nuevos.join(','));
+  };
   return { abiertos, alternar };
 }
 
-type ModuloContadores = typeof import('@/modulos/prototipo/lib/contadores');
-
 /**
- * Alertas y hallazgos abiertos de los datos simulados del prototipo (como en su menú). El cálculo se carga aparte,
- * después de mostrar la página, para no sumar el motor del prototipo a las demás pantallas.
+ * Pendientes del usuario, como etiquetas del menú: gastos que puede autorizar ahora, sus borradores o rechazados, y las
+ * alertas y los hallazgos abiertos (GET /api/v1/alertas/contadores, con el filtro de estación del encabezado). Todo
+ * sale de la base; las pantallas que cambian esos números invalidan la clave ['contadores'].
  */
-function useContadoresSimulados(): Record<string, number> {
-  const { perfil, estaciones, estacionId } = useErp();
-  const necesita = perfil.acceso.pantallas.some((p) => p.codigo === 'alertas' || p.codigo === 'hallazgos');
-  const [modulo, setModulo] = useState<ModuloContadores | null>(null);
-  const [version, setVersion] = useState(0);
-  useEffect(() => {
-    if (!necesita) return;
-    let vivo = true;
-    void import('@/modulos/prototipo/lib/contadores').then((m) => {
-      if (!vivo) return;
-      m.cargarGuardado();
-      setModulo(m);
-    });
-    return () => {
-      vivo = false;
-    };
-  }, [necesita]);
-  useEffect(() => modulo?.suscribir(() => setVersion((v) => v + 1)), [modulo]);
-  const codigoFiltro = estaciones.find((e) => e.id === estacionId)?.codigo ?? null;
-  // `version` cambia cuando cambian los datos simulados (en esta u otra pestaña)
-  return useMemo(() => (modulo && version >= 0 ? modulo.contadoresSimulados(perfil, codigoFiltro) : {}), [modulo, perfil, codigoFiltro, version]);
-}
-
-/** Pendientes del usuario: gastos que puede autorizar ahora y sus borradores o rechazados. */
 function useContadores(): Record<string, number> {
-  const { perfil } = useErp();
+  const { perfil, estacionId } = useErp();
   const ve = (c: string) => perfil.acceso.pantallas.some((p) => p.codigo === c);
   const autoriza = ve('autorizaciones') && perfil.acceso.permisos.includes('aprobar');
   const pendientes = useListaGastos({ estado: 'pendiente', porPagina: 100 }, { habilitado: autoriza });
   const mias = useListaGastos({ soloMios: 'true', estado: 'borrador,rechazado', porPagina: 1 }, { habilitado: ve('mis-solicitudes') });
-  const simulados = useContadoresSimulados();
+  const control = useQuery({
+    queryKey: ['contadores', estacionId ?? null],
+    queryFn: async () => (await pedir(api.GET('/api/v1/alertas/contadores', { params: { query: estacionId ? { estacionId } : {} } }))).data,
+    enabled: ve('alertas') || ve('hallazgos'),
+    refetchInterval: 60_000,
+  });
   return {
-    ...simulados,
+    alertas: control.data?.alertas ?? 0,
+    hallazgos: control.data?.hallazgos ?? 0,
     autorizaciones: autoriza ? (pendientes.data?.data.filter((g) => g.acciones.aprobar.ok).length ?? 0) : 0,
     'mis-solicitudes': mias.data?.resumen.cantidad ?? 0,
   };
 }
 
+/** El detalle de un gasto (/gastos/:id) marca «Registro de gastos» en el menú */
 function activa(o: Opcion, ruta: string): boolean {
   if (o.destino !== '/gastos') return ruta === o.destino;
-  // El detalle de un gasto real marca "Registro de gastos"; el de un gasto simulado, no
-  return ruta === '/gastos' || (ruta.startsWith('/gastos/') && !ruta.startsWith('/gastos/simulados/'));
+  return ruta === '/gastos' || ruta.startsWith('/gastos/');
 }
 
 export function BarraLateral() {
@@ -199,7 +177,7 @@ export function BarraLateral() {
   const hoy = catalogos.data?.parametros.hoy;
   const opciones = useMemo(() => opcionesPorModulo(perfil.acceso.pantallas), [perfil]);
   const moduloActivo = MODULOS.find((m) => opciones[m.clave].some((o) => activa(o, ruta)))?.clave ?? null;
-  const { abiertos, alternar } = useModulosAbiertos(perfil.usuario.id, moduloActivo);
+  const { abiertos, alternar } = useModulosAbiertos(moduloActivo);
 
   // Contador de pendientes (por autorizar, borradores, alertas): etiqueta ámbar de la plantilla
   const CONTADOR =
@@ -214,7 +192,9 @@ export function BarraLateral() {
         </span>
         <span className="min-w-0">
           <span className="block truncate text-[13px] font-bold leading-[1.2] text-tinta">{NOMBRE_APP}</span>
-          <span className="block truncate text-[10px] leading-[1.3] text-tenue">{FRANQUICIA} · Concepción Las Minas</span>
+          <span className="block truncate text-[10px] leading-[1.3] text-tenue">
+            {[perfil.empresa.franquicia, perfil.empresa.nombre].filter(Boolean).join(' · ')}
+          </span>
         </span>
       </Link>
 
@@ -298,7 +278,7 @@ export function BarraLateral() {
       </nav>
 
       <div className="border-t border-borde px-[9px] py-[6px] text-[10px] leading-[1.4] text-tenue">
-        Datos en el servidor local.{hoy ? ` Fecha del sistema: ${fecha(hoy)}.` : ''}
+        {hoy ? `Fecha del sistema: ${fecha(hoy)}.` : ''}
         <span className="mt-[2px] block font-semibold text-tinta-suave">Versión {VERSION}</span>
       </div>
     </div>

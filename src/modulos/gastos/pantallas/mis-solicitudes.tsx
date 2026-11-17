@@ -103,7 +103,7 @@ export function PantallaMisSolicitudes({ nuevo = false }: { nuevo?: boolean }) {
         descripcion="Los gastos que usted registró, con el paso en que va cada uno."
         acciones={
           <>
-            {/* Como en el prototipo: los requerimientos de compra se hacen en Compras administrativas */}
+            {/* Como en el diseño original: los requerimientos de compra se hacen en Compras administrativas */}
             {veCompras && (
               <EnlaceBoton href="/compras" variante="secondary">
                 <Plus aria-hidden /> Requerimiento de compra

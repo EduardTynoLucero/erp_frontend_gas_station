@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utilidades';
 
-/** Clases de la barra y de cada pestaña (también las usa el menú de pestañas de las pantallas del prototipo). */
+/** Clases de la barra y de cada pestaña (también las usa el menú de pestañas de las pantallas del diseño original). */
 export const BARRA_PESTANAS = 'mb-[6px] flex min-h-[34px] items-stretch overflow-x-auto rounded-[2px] border border-borde bg-superficie [scrollbar-width:none]';
 
 export function clasePestana(activa: boolean): string {

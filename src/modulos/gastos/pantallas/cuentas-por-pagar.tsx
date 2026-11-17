@@ -21,7 +21,6 @@ import { useCatalogos, useListaGastos } from '../datos';
 import { CeldaMonto, nombreProveedor } from '../etiquetas';
 
 type Pestana = 'porPagar' | 'pagos' | 'proveedores';
-const DIAS_ALERTA_VENCIMIENTO = 5;
 
 const suma = (gastos: GastoResumen[]) => gastos.reduce((t, g) => t.plus(g.montoFuncional), new Decimal(0));
 
@@ -31,6 +30,8 @@ export function PantallaCuentasPorPagar() {
   const paga = useTienePermiso('pagar');
   const catalogos = useCatalogos();
   const hoy = catalogos.data?.parametros.hoy ?? '';
+  // Con cuántos días de anticipación se avisa un vencimiento: el parámetro de Configuración (sin él, nada en ámbar)
+  const diasAlerta = catalogos.data?.parametros.diasAlertaVencimiento ?? -1;
   const [pestana, setPestana] = useState<Pestana>('porPagar');
   const [pagar, setPagar] = useState<GastoResumen | null>(null);
 
@@ -55,14 +56,16 @@ export function PantallaCuentasPorPagar() {
   const agrupar = (gastos: GastoResumen[], clave: (g: GastoResumen) => string) => {
     const grupos = new Map<string, GastoResumen[]>();
     for (const g of gastos) grupos.set(clave(g), [...(grupos.get(clave(g)) ?? []), g]);
+    // El total de cada grupo se suma con decimales exactos y viaja como texto; el número solo ordena las barras
     return [...grupos.entries()]
-      .map(([k, lista]) => ({ clave: k, etiqueta: k, valor: suma(lista).toNumber(), sub: `${lista.length} doc.` }))
-      .sort((a, b) => b.valor - a.valor);
+      .map(([k, lista]) => ({ clave: k, etiqueta: k, total: suma(lista), sub: `${lista.length} doc.` }))
+      .sort((a, b) => b.total.comparedTo(a.total))
+      .map(({ total, ...resto }) => ({ ...resto, valor: total.toFixed(2) }));
   };
 
   function tonoVence(d: number): Tono {
     if (d < 0) return 'red';
-    return d <= DIAS_ALERTA_VENCIMIENTO ? 'amber' : 'gray';
+    return d <= diasAlerta ? 'amber' : 'gray';
   }
 
   return (
@@ -82,7 +85,7 @@ export function PantallaCuentasPorPagar() {
             <Indicador
               key={t.etiqueta}
               etiqueta={t.etiqueta}
-              valor={qk(suma(lista).toNumber())}
+              valor={qk(suma(lista).toFixed(2))}
               pista={`${lista.length} documentos`}
               tono={t.etiqueta === 'Vencido' && lista.length > 0 ? 'red' : undefined}
             />

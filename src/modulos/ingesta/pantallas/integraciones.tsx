@@ -15,6 +15,7 @@ import { Aviso, EsqueletoTabla } from '@/componentes/ui/aviso';
 import { Boton } from '@/componentes/ui/boton';
 import { Campo, Seleccion } from '@/componentes/ui/campos';
 import { EncabezadoPagina, Tarjeta } from '@/componentes/ui/tarjeta';
+import { COMO_ENCENDER_ETL } from '@/lib/entorno';
 import { cn } from '@/lib/utilidades';
 import { HistorialCargas } from '../componentes/historial-cargas';
 import { TarjetaSubida } from '../componentes/tarjeta-subida';
@@ -50,10 +51,7 @@ function EstadoServicio({ activo }: { activo: boolean }) {
           {activo ? (
             'Revisa cada archivo en cuanto llega y lo carga al confirmar: validación, cuadre, modelo de ventas y estadísticas al día.'
           ) : (
-            <>
-              Los archivos que suba quedan en cola y se revisan cuando se encienda. Para encenderlo, abra una terminal en la carpeta etl y
-              déjela corriendo con: <code className="font-mono text-xs">npm run dev</code>
-            </>
+            `Los archivos que suba quedan en cola y se revisan cuando se encienda. ${COMO_ENCENDER_ETL}`
           )}
         </p>
       </div>

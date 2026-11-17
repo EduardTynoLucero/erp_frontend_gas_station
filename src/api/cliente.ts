@@ -9,6 +9,7 @@
  * - Los errores application/problem+json se convierten en ErrorApi con `codigo` y `errores` por campo.
  */
 import createClient from 'openapi-fetch';
+import { MENSAJE_SIN_CONEXION } from '@/lib/entorno';
 import type { paths } from './esquema';
 
 export interface ErrorCampo {
@@ -28,6 +29,8 @@ export class ErrorApi extends Error {
     this.name = 'ErrorApi';
   }
 }
+
+export { MENSAJE_SIN_CONEXION };
 
 let renovacion: Promise<boolean> | null = null;
 
@@ -86,7 +89,7 @@ export async function pedir<T>(llamada: Promise<{ data?: T; error?: unknown; res
   try {
     resultado = await llamada;
   } catch {
-    throw new ErrorApi(0, 'SIN_CONEXION', 'No hay conexión con el servidor. Revise que el backend esté encendido (npm run dev en backend/).');
+    throw new ErrorApi(0, 'SIN_CONEXION', MENSAJE_SIN_CONEXION);
   }
   const { data, error, response } = resultado;
   if (!response.ok || error !== undefined) {

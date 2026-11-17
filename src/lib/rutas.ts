@@ -14,10 +14,10 @@ export interface RequisitoRuta {
 }
 
 /**
- * Pantallas del prototipo de gastos que trabajan con sus datos simulados (modulos/prototipo) mientras el backend no
- * expone sus tablas, y el módulo del ERP al que pertenece cada una (el de iam.pantalla.modulo).
+ * Pantallas de gastos, control y administración cuya ruta es su mismo código (/tablero, /caja-chica…), con el módulo
+ * del ERP al que pertenece cada una (el de iam.pantalla.modulo). Todas leen y guardan en la base por la API.
  */
-export const PANTALLAS_SIMULADAS: Readonly<Record<string, ModuloRuta>> = {
+export const PANTALLAS_POR_CODIGO: Readonly<Record<string, ModuloRuta>> = {
   tablero: 'gastos',
   alertas: 'gastos',
   hallazgos: 'auditoria',
@@ -51,11 +51,12 @@ export const RUTA_DE_PANTALLA: Readonly<Record<string, string>> = {
   inventario: '/inventario',
   'tomas-fisicas': '/tomas-fisicas',
   'historial-cargas': '/historial-cargas',
-  ...Object.fromEntries(Object.keys(PANTALLAS_SIMULADAS).map((codigo) => [codigo, `/${codigo}`])),
+  ...Object.fromEntries(Object.keys(PANTALLAS_POR_CODIGO).map((codigo) => [codigo, `/${codigo}`])),
   ...Object.fromEntries(PANTALLAS_INTEGRACIONES.map((codigo) => [codigo, '/integraciones'])),
 };
 
-const CONSULTA_GASTOS = ['gastos', 'mis-solicitudes', 'autorizaciones', 'cuentas-por-pagar'];
+/** Pantallas con las que se puede consultar un gasto (las mismas que exige el backend en GET /gastos/:id) */
+const DETALLE_GASTO = ['gastos', 'mis-solicitudes', 'autorizaciones', 'cuentas-por-pagar'];
 
 const REGLAS: { patron: RegExp; requisito: RequisitoRuta }[] = [
   { patron: /^\/dashboard-ventas\/?$/, requisito: { modulos: ['dashboards'], pantallas: ['dashboard-ventas'] } },
@@ -63,16 +64,16 @@ const REGLAS: { patron: RegExp; requisito: RequisitoRuta }[] = [
   { patron: /^\/tomas-fisicas\/?$/, requisito: { modulos: ['dashboards'], pantallas: ['tomas-fisicas'] } },
   { patron: /^\/historial-cargas\/?$/, requisito: { modulos: ['dashboards', 'gastos'], pantallas: ['historial-cargas', ...PANTALLAS_INTEGRACIONES] } },
   { patron: /^\/integraciones\/?$/, requisito: { modulos: ['gastos', 'dashboards'], pantallas: PANTALLAS_INTEGRACIONES } },
-  // Detalle de un gasto de los datos simulados (enlaces del tablero, alertas, compras…)
-  { patron: /^\/gastos\/simulados\/[^/]+\/?$/, requisito: { modulos: ['gastos'], pantallas: CONSULTA_GASTOS } },
   { patron: /^\/gastos\/nuevo\/?$/, requisito: { modulos: ['gastos'], pantallas: ['gastos', 'mis-solicitudes'] } },
   { patron: /^\/gastos\/[^/]+\/editar\/?$/, requisito: { modulos: ['gastos'], pantallas: ['gastos', 'mis-solicitudes'] } },
-  { patron: /^\/gastos\/[^/]+\/?$/, requisito: { modulos: ['gastos'], pantallas: CONSULTA_GASTOS } },
+  // El detalle de un gasto también se abre desde las pantallas que lo enlazan (tablero, alertas, compras, caja chica…):
+  // basta con tener alguna; qué gasto ve cada quien lo decide el backend
+  { patron: /^\/gastos\/[^/]+\/?$/, requisito: { modulos: ['gastos', 'auditoria'], pantallas: DETALLE_GASTO } },
   { patron: /^\/gastos\/?$/, requisito: { modulos: ['gastos'], pantallas: ['gastos'] } },
   { patron: /^\/mis-solicitudes\/?$/, requisito: { modulos: ['gastos'], pantallas: ['mis-solicitudes'] } },
   { patron: /^\/autorizaciones\/?$/, requisito: { modulos: ['gastos'], pantallas: ['autorizaciones'] } },
   { patron: /^\/cuentas-por-pagar\/?$/, requisito: { modulos: ['gastos'], pantallas: ['cuentas-por-pagar'] } },
-  ...Object.entries(PANTALLAS_SIMULADAS).map(([codigo, modulo]) => ({
+  ...Object.entries(PANTALLAS_POR_CODIGO).map(([codigo, modulo]) => ({
     patron: new RegExp(`^/${codigo}/?$`),
     requisito: { modulos: [modulo], pantallas: [codigo] },
   })),
@@ -98,7 +99,7 @@ export function tienePermiso(perfil: Perfil, permiso: string): boolean {
 }
 
 /**
- * Pantalla de inicio de cada usuario, la misma del prototipo (inicioDe de Expenses_project/src/lib/acceso.ts):
+ * Pantalla de inicio de cada usuario, la misma del diseño original (inicioDe de Expenses_project/src/lib/acceso.ts):
  * Tesorería entra a cuentas por pagar, el encargado de caja chica a su caja, quien solo ve lo suyo a sus solicitudes
  * y los demás al Tablero. Sin Tablero, al Dashboard de ventas si tiene el módulo de dashboards.
  */

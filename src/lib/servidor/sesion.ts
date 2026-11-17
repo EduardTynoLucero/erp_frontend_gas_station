@@ -16,3 +16,20 @@ export async function perfilActual(): Promise<Perfil | null> {
   if (!respuesta.ok) return null;
   return ((await respuesta.json()) as { data: Perfil }).data;
 }
+
+/**
+ * Preferencias de interfaz del usuario (menú abierto, filtros a la vista, estación del filtro), que viven en la base:
+ * GET /api/v1/preferencias. Se leen aquí para armar la página ya con ellas. Si no se pueden leer (sin conexión con el
+ * backend en este instante), devuelve null y el navegador las pide al montar: no son motivo para no mostrar la página.
+ */
+export async function preferenciasActuales(): Promise<Record<string, string> | null> {
+  const token = (await cookies()).get('erp_acceso')?.value;
+  if (!token) return null;
+  try {
+    const respuesta = await fetch(`${urlApi()}/api/v1/preferencias`, { headers: { authorization: `Bearer ${token}` }, cache: 'no-store' });
+    if (!respuesta.ok) return null;
+    return ((await respuesta.json()) as { data: Record<string, string> }).data;
+  } catch {
+    return null;
+  }
+}

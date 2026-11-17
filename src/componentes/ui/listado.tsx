@@ -6,30 +6,18 @@
  * etiqueta de 10 px sobre un control de 28 px.
  */
 import { ChevronDown, SlidersHorizontal, X } from 'lucide-react';
-import { type ReactNode, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { usePreferencia } from '@/componentes/marco/preferencias';
 import { cn } from '@/lib/utilidades';
 
-/** Si los filtros de una pantalla están a la vista: se recuerda en este navegador. */
+/**
+ * Si los filtros de una pantalla están a la vista. Es una preferencia del usuario y se guarda en la base (no en el
+ * navegador). `clave` es el código de la pantalla, en minúsculas y con guiones («gastos», «caja-chica»).
+ */
 export function useFiltrosAbiertos(clave: string, inicial = true): [boolean, () => void] {
-  const [abierto, setAbierto] = useState(inicial);
-  useEffect(() => {
-    try {
-      const guardado = localStorage.getItem(`erp:filtros:${clave}`);
-      if (guardado === '1' || guardado === '0') setAbierto(guardado === '1');
-    } catch {
-      // sin almacenamiento: queda como empieza
-    }
-  }, [clave]);
-  const alternar = () =>
-    setAbierto((a) => {
-      try {
-        localStorage.setItem(`erp:filtros:${clave}`, a ? '0' : '1');
-      } catch {
-        // sin almacenamiento: vale hasta recargar
-      }
-      return !a;
-    });
-  return [abierto, alternar];
+  const [guardado, fijar] = usePreferencia(`filtros:${clave}`, inicial ? '1' : '0');
+  const abierto = guardado === '1';
+  return [abierto, () => fijar(abierto ? '0' : '1')];
 }
 
 export function BarraFiltros({

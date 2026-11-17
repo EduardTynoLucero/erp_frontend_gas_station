@@ -19,6 +19,7 @@ import { Modal } from '@/componentes/ui/modal';
 import { BarraTabla, BuscadorTabla, CUERPO_TABLA, MostrarRegistros, Paginacion, PieTabla, td as tdFino, th as thFino } from '@/componentes/ui/tabla';
 import { EncabezadoPagina } from '@/componentes/ui/tarjeta';
 import { useTienePantalla } from '@/componentes/marco/contexto';
+import { usePreferencia } from '@/componentes/marco/preferencias';
 import { cn } from '@/lib/utilidades';
 import { Estado } from '@/modulos/dashboards/componentes/iconos';
 import { BOTON_CHICO, Cargando, Segmentado, TARJETA, TarjetaVacia, Veredicto } from '@/modulos/dashboards/componentes/piezas';
@@ -29,7 +30,6 @@ import { BarraOperacion, CAMPO, type FiltrosFecha } from '../componentes/filtros
 import {
   hoy,
   type OpcionesOperacion,
-  preferencia,
   rangoRapido,
   type TomaFisica,
   useAnularToma,
@@ -75,10 +75,12 @@ export function PantallaTomasFisicas() {
   const [anulando, setAnulando] = useState<TomaFisica | null>(null);
   const [bitacora, setBitacora] = useState<TomaFisica | null>(null);
 
+  // La estación que el usuario dejó elegida (preferencia guardada en la base; la comparten Inventario y Tomas físicas)
+  const [recordada, recordarEstacion] = usePreferencia('operacion:estacion', '');
+
   const o = opciones.data;
   if (o && o.estaciones.length && (!filtros || !o.estaciones.some((e) => e.codigo === filtros.estacion))) {
-    const recordada = preferencia.leer('estacion');
-    const estacion = o.estaciones.some((e) => e.codigo === recordada) ? recordada! : o.estaciones[0]!.codigo;
+    const estacion = o.estaciones.some((e) => e.codigo === recordada) ? recordada : o.estaciones[0]!.codigo;
     setFiltros({ estacion, desde: '', hasta: '', rapido: '', producto: '', estado: 'vigentes' });
   }
   const consulta = filtros
@@ -147,7 +149,7 @@ export function PantallaTomasFisicas() {
     );
 
   const cambiar = (f: typeof filtros) => {
-    preferencia.guardar('estacion', f!.estacion);
+    if (f!.estacion !== recordada) recordarEstacion(f!.estacion);
     setFiltros(f);
     setPagina(1);
   };

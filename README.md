@@ -1,18 +1,22 @@
 # Frontend · ERP Gas Station
 
 Interfaz del ERP de la gasolinera en **Next.js 16 (App Router)**, **React 19** y **Tailwind CSS 4**, con modo claro y
-oscuro. Consume la API REST del backend local (`http://localhost:4000/api/v1`). El menú tiene **dos módulos**:
+oscuro. Consume la API REST del backend (`/api/v1`, en la PC `http://localhost:4000`). El menú tiene **dos módulos**:
 
 - **Dashboards** (reportería, analítica e indicadores): Tablero de gastos, Dashboard de ventas (réplica de la pestaña
   «Dashboard» del panel del ETL), Indicadores gerenciales, Reportes e **Integraciones**, con la **carga real de
   reportes de BISS al ETL** (arrastrar y soltar, vista previa del servicio ETL y carga).
-- **Gastos** (todo el flujo operativo del prototipo `Expenses_project`): Registro de gastos, Solicitudes y
-  autorizaciones, Cuentas por pagar y Mis solicitudes sobre la API real; Caja chica, Compras, Proveedores, Contratos,
-  Presupuestos y las demás pantallas del prototipo con sus datos simulados mientras el backend no expone sus tablas.
+- **Gastos** (todo el flujo operativo): Registro de gastos, Solicitudes y autorizaciones, Cuentas por pagar, Mis
+  solicitudes, Caja chica, Compras, Proveedores, Contratos, Recurrentes, Presupuestos, Prorrateo, Franquicia, Alertas,
+  Hallazgos, Auditoría, Catálogos, Estaciones, Usuarios y roles y Configuración.
+
+**Todas las pantallas trabajan con la base por la API del backend.** No hay pantallas con datos simulados, ni datos
+escritos en el código, ni nada guardado en `localStorage` o `sessionStorage` (ver «Pantallas conectadas a la API»).
 
 La **protección de rutas** por módulo y pantalla está en `src/proxy.ts`.
 
-> Todo es local: el backend y PostgreSQL corren en esta máquina (ver `../backend/README.md`).
+> En desarrollo todo es local: el backend y PostgreSQL corren en esta máquina (ver `../backend/README.md`). En
+> producción (Dokploy), ver `../CONFIGURACION_DOKPLOY.txt`.
 
 ## Puesta en marcha
 
@@ -31,7 +35,9 @@ npm install
 npm run dev                  # http://localhost:3000
 ```
 
-Usuarios, uno por puesto (contraseña `demo123`). La pantalla de inicio de sesión los lista.
+Usuarios de la base local, uno por puesto (los crea `npm run db:semilla` con la contraseña `demo123`). La pantalla de
+inicio de sesión no lista usuarios ni trae contraseñas: los usuarios viven en la base y se administran en *Usuarios y
+roles*; cada quien cambia su contraseña en el menú de usuario → *Cambiar contraseña*.
 
 | Usuario | Entra a | Ve |
 |---|---|---|
@@ -61,27 +67,35 @@ src/
 │   ├── layout.tsx · globals.css  fuente Inter, Tailwind 4, tokens de marca y de gráficas (claro/oscuro)
 │   ├── login/                    inicio de sesión (fuera del marco)
 │   ├── api/v1/auth/renovar/      renueva la sesión con la cookie de refresco y vuelve a la página pedida
-│   └── (erp)/                    páginas con el marco del ERP: gastos, autorizaciones, cuentas-por-pagar,
-│       │                         mis-solicitudes, dashboard-ventas, integraciones, sin-acceso
-│       └── (prototipo)/          las pantallas del prototipo con datos simulados (tablero, caja-chica, compras…)
+│   └── (erp)/                    páginas con el marco del ERP, una carpeta por pantalla: gastos, autorizaciones,
+│                                 cuentas-por-pagar, mis-solicitudes, tablero, indicadores, reportes, alertas,
+│                                 hallazgos, auditoria, caja-chica, compras, proveedores, contratos, recurrentes,
+│                                 presupuestos, prorrateo, franquicia, catalogos, estaciones, usuarios, configuracion,
+│                                 dashboard-ventas, inventario, tomas-fisicas, historial-cargas, integraciones
 ├── api/                          cliente tipado (openapi-fetch + tipos generados del contrato OpenAPI)
 ├── componentes/
-│   ├── ui/                       botones (BotonAccion con { ok, motivo }), campos, tablas, tarjetas, avisos, modal
-│   ├── marco/                    barra lateral con los dos módulos, encabezado, menú de usuario, tema
+│   ├── ui/                       botones (BotonAccion con { ok, motivo }), campos, tablas, tarjetas, avisos, modal,
+│   │                             barras y columnas de las pantallas de gastos
+│   ├── marco/                    barra lateral con los dos módulos, encabezado, menú de usuario (tema y cambio de
+│   │                             contraseña), preferencias de interfaz (guardadas en la base) y tema
 │   └── proveedores.tsx           tema, React Query, tooltips, notificaciones
-├── modulos/
-│   ├── gastos/                   datos (React Query), validación, formulario, diálogos y pantallas
-│   ├── dashboards/               datos, filtros, formatos, colores por producto, gráficas y pantalla
-│   ├── ingesta/                  carga de reportes al ETL: zona de carga, subidas con su vista previa, historial
-│   └── prototipo/                el código de Expenses_project/src (mismas rutas de archivo): reglas, datos
-│                                 iniciales y pantallas, sobre el marco y los componentes del ERP
-└── lib/                          formato de montos sin float, rutas y permisos, marca
+├── modulos/                      un módulo por pantalla o grupo de pantallas: datos.ts (consultas y acciones con
+│   │                             TanStack Query sobre la API) y pantallas/ y componentes/
+│   ├── gastos/                   registro, autorizaciones, cuentas por pagar, mis solicitudes y detalle del gasto
+│   ├── tablero/ indicadores/ reportes/ alertas/ franquicia/      analítica de gastos (cifras calculadas por el backend)
+│   ├── hallazgos/ auditoria/     control: hallazgos del ETL y bitácora
+│   ├── caja-chica/ compras/ presupuestos/ prorrateo/             operación financiera
+│   ├── proveedores/ contratos/ recurrentes/ catalogos/           datos maestros
+│   ├── usuarios/ estaciones/ configuracion/                      administración
+│   ├── dashboards/ operacion/    dashboard de ventas, inventario y tanques, tomas físicas (datos del ETL)
+│   └── ingesta/                  carga de reportes al ETL: zona de carga, subidas con su vista previa, historial
+└── lib/                          formato de montos sin float, rutas y permisos, marca, tema, CSV, mensajes por entorno
 ```
 
 - **Mismo origen:** `src/proxy.ts` reenvía `/api/v1/*` (menos las rutas propias, como `/api/v1/auth/renovar`) hacia
   `API_URL`, leída en cada petición. No se usan rewrites de `next.config.ts` porque se fijan al compilar y la imagen de
   Docker quedaría atada a un backend. El navegador solo habla con el frontend (en producción,
-  `https://gasstationerp.belsoftinc.net`; el cliente usa rutas relativas, `/api/v1/...`), así que las cookies httpOnly
+  `https://gasstationconcepcion.belsoftinc.net`; el cliente usa rutas relativas, `/api/v1/...`), así que las cookies httpOnly
   del backend quedan solo en este subdominio y funcionan sin CORS, y la protección CSRF del backend (cabecera `Origin`)
   las acepta. En producción el reenvío va a `https://backend-gas-station.belsoftinc.net`, con la IP real del usuario
   aparte (`X-Erp-Ip-Cliente` + `SECRETO_REENVIO`). El frontend no llama al ETL: lo que el ETL deja en la base lo sirve
@@ -90,6 +104,15 @@ src/
   API llegan como `ErrorApi` (problem+json: `codigo`, `detail`, `errores[{ campo, mensaje }]`).
 - **Sesión en el navegador:** si una petición responde 401, el cliente renueva el token (`POST /auth/refresh`, una
   sola renovación compartida) y repite la petición. Si no puede renovarla, manda al inicio de sesión.
+- **Nada en `localStorage` ni `sessionStorage`:** lo que la interfaz recuerda de cada usuario (módulos del menú
+  abiertos, filtros a la vista, estación del filtro del encabezado, estación elegida en Inventario y Tomas físicas) es
+  una preferencia guardada en la base (`iam.usuario_preferencia`, `GET`/`PUT /api/v1/preferencias`) y lo acompaña a
+  cualquier equipo: `usePreferencia(clave, porDefecto)` en `componentes/marco/preferencias.tsx`. El layout del servidor
+  las entrega con la página, así el menú sale como el usuario lo dejó, sin parpadeo. El **tema** claro u oscuro es lo
+  único que se recuerda en el navegador, en la cookie `erp_tema`, porque debe aplicarse antes de iniciar sesión y
+  antes de pintar (`lib/tema.ts`; no se usa `next-themes`).
+- **Mensajes según el entorno:** en la PC los avisos de «sin conexión» y «ETL apagado» dicen cómo encender el servicio
+  (`npm run dev`); en producción solo dicen qué pasa y a quién avisar (`lib/entorno.ts`).
 
 ## Autenticación y permisos (`src/proxy.ts`)
 
@@ -110,13 +133,13 @@ src/
 | `/dashboard-ventas` | módulo `dashboards` y pantalla `dashboard-ventas` |
 | `/gastos` | módulo `gastos` y pantalla `gastos` |
 | `/gastos/nuevo`, `/gastos/:id/editar` | `gastos` o `mis-solicitudes`. Solo redirigen: abren el modal sobre el listado (`/gastos?nuevo=1` o `/mis-solicitudes?nuevo=1`) y sobre el detalle (`/gastos/:id?editar=1`) |
-| `/gastos/:id` · `/gastos/simulados/:id` | cualquier pantalla de consulta de gastos |
+| `/gastos/:id` | cualquier pantalla de consulta de gastos (qué gasto ve cada quien lo decide el backend) |
 | `/autorizaciones` · `/cuentas-por-pagar` · `/mis-solicitudes` | su pantalla |
 | `/inventario` | módulo `dashboards` y pantalla `inventario` (nivel de tanques; «Configurar tanques» con el permiso `configurar_tanques`) |
 | `/tomas-fisicas` | módulo `dashboards` y pantalla `tomas-fisicas` (registrar, editar y anular con el permiso `tomas_fisicas`; sin él, solo lectura) |
 | `/historial-cargas` | `historial-cargas`, `cargas` o `integraciones` |
 | `/integraciones` | `integraciones` o `cargas` (cargar reportes) |
-| `/tablero`, `/caja-chica`, `/compras` y demás pantallas con datos simulados | su pantalla y el módulo al que pertenece (`gastos`; `auditoria` para hallazgos y bitácora; `administracion` para usuarios y estaciones) |
+| `/tablero`, `/caja-chica`, `/compras` y las demás pantallas de gastos, control y administración | su pantalla y el módulo al que pertenece (`gastos`; `auditoria` para hallazgos y bitácora; `administracion` para usuarios y estaciones) |
 
 El perfil viaja al layout del servidor en la cabecera interna `x-erp-perfil`, así que no se pide dos veces. El backend
 vuelve a validar todo (pantallas, permisos, estaciones y RLS): el proxy solo decide la navegación.
@@ -193,7 +216,8 @@ Comportamiento:
 La barra lateral tiene solo dos secciones desplegables, **Dashboards** y **Gastos**, sin las fases del prototipo. El
 módulo de cada pantalla y su orden los da el backend (`iam.pantalla.grupo` y `orden`, migración 0004). Cada usuario ve
 solo sus pantallas. Si un módulo está cerrado, su encabezado suma los pendientes de sus pantallas. Lo abierto o
-cerrado se recuerda por usuario en este navegador, y el módulo de la página abierta siempre se ve.
+cerrado se recuerda por usuario en la base (preferencia `menu`), y el módulo de la página abierta siempre se ve. Los
+números de Alertas y Hallazgos salen de `GET /api/v1/alertas/contadores`.
 
 Jerarquía visual (`src/componentes/marco/barra-lateral.tsx`): cada módulo es un bloque, separado del otro por un
 espacio con un divisor. Su encabezado es una tarjeta (fondo de barra, borde y franja roja a la izquierda) con el
@@ -204,8 +228,8 @@ cortarse. Los colores son los de la plantilla, que cambian solos con el tema cla
 
 | Módulo | Pantallas | Datos |
 |---|---|---|
-| Dashboards | Tablero de gastos · Dashboard de ventas · Indicadores gerenciales · Reportes · Integraciones | Dashboard de ventas y carga de reportes (Integraciones): reales (ETL). Tablero, Indicadores y Reportes: simulados |
-| Gastos | Mis solicitudes · Registro de gastos · Solicitudes y autorizaciones · Cuentas por pagar · Caja chica · Compras · Proveedores · Contratos · Recurrentes · Presupuestos · Prorrateo · Franquicia · Alertas · Hallazgos · Auditoría · Catálogos · Estaciones · Usuarios y roles · Configuración | Las cuatro primeras: API real. Las demás: simuladas |
+| Dashboards | Tablero de gastos · Dashboard de ventas · Indicadores gerenciales · Reportes · Integraciones | Todo de la base: ventas, inventario y cargas del ETL; tablero, indicadores y reportes calculados por el backend sobre los gastos |
+| Gastos | Mis solicitudes · Registro de gastos · Solicitudes y autorizaciones · Cuentas por pagar · Caja chica · Compras · Proveedores · Contratos · Recurrentes · Presupuestos · Prorrateo · Franquicia · Alertas · Hallazgos · Auditoría · Catálogos · Estaciones · Usuarios y roles · Configuración | Todo de la base, por la API del backend |
 
 ## Integraciones: carga de reportes al ETL
 
@@ -213,7 +237,8 @@ La zona de carga del panel del ETL, dentro del ERP y con su seguridad:
 
 1. **Subir:** se arrastran (o se eligen) uno o varios `.xlsx` de BISS, la Consulta de Tickets o el Reporte de compras.
    Cada archivo viaja tal cual a `POST /api/v1/ingesta/subidas`, con una barra de avance. El backend lo guarda en la
-   carpeta compartida con el servicio ETL y deja la solicitud en la cola `ingesta.solicitud`.
+   base (`ingesta.archivo`) en la misma transacción en que deja la solicitud en la cola `ingesta.solicitud`: el
+   backend y el servicio ETL no comparten ninguna carpeta (en Dokploy son contenedores distintos).
 2. **Revisión del servicio ETL:** el servicio la toma en segundos, con el mismo código del panel: lee, valida, cuadra
    contra los totales del propio reporte y compara con la base. La tarjeta muestra:
    - qué trae: tickets o líneas, venta, galones, estación y periodo;
@@ -250,49 +275,43 @@ Más detalles de la pantalla:
   subida terminaba en un error 500 («Request body exceeded 10MB», «socket hang up»). Por eso `next.config.ts` fija
   `experimental.proxyClientMaxBodySize` en 64 MB. Al cambiar `next.config.ts` hay que reiniciar `npm run dev`.
 
-## Pantallas del prototipo con datos simulados
+## Pantallas conectadas a la API
 
-Las pantallas que el backend todavía no expone trabajan con el motor del propio prototipo y datos simulados, igual que
-su versión de un solo archivo. Registro de gastos, Solicitudes y autorizaciones, Cuentas por pagar, Mis solicitudes, el
-Dashboard de ventas y la carga de reportes están conectados a la API real.
+Todas las pantallas leen y guardan en PostgreSQL por la API del backend. El motor del prototipo (`modulos/prototipo`,
+con sus datos simulados en `localStorage`) se eliminó: no queda ninguna pantalla simulada, ningún dato escrito en el
+código ni la marca de «datos simulados». Un gasto registrado aparece enseguida en el Tablero, los Indicadores, los
+Reportes, las Alertas y el resto, porque todo sale de las mismas tablas.
 
-Los dos lados están separados. Un gasto del Registro de gastos (backend) todavía no aparece en el Tablero de gastos,
-Indicadores, Reportes ni en las demás pantallas simuladas, que leen solo lo registrado en ellas.
+| Pantalla (ruta) | API del backend | Tablas |
+|---|---|---|
+| Tablero de gastos (`/tablero`) · Indicadores gerenciales (`/indicadores`) · Reportes (`/reportes`) · Franquicia (`/franquicia`) | `GET /api/v1/tablero`, `/indicadores`, `/reportes`, `/franquicia` | `expenses.gasto`, `expenses.presupuesto` y las ventas del ETL (`dashboards.v_ventas_mensuales`) |
+| Alertas (`/alertas`) | `GET /api/v1/alertas`, `/alertas/contadores` | calculadas sobre gastos, presupuestos, contratos, caja chica y cargas del ETL |
+| Hallazgos (`/hallazgos`) | `/api/v1/hallazgos` (registrar, analizar los reportes del ETL, cambiar estado, registrar como gasto) | `audit.hallazgo` |
+| Auditoría y trazabilidad (`/auditoria`) | `GET /api/v1/auditoria` | `audit.evento` (inmutable) |
+| Caja chica (`/caja-chica`) | `/api/v1/caja-chica` (abrir caja, desembolsos, liquidar) | `expenses.caja_chica`, `caja_movimiento`, `caja_liquidacion` |
+| Compras (`/compras`) | `/api/v1/compras` (requerimiento, cotizaciones, orden, recepción) | `expenses.orden_compra`, `orden_cotizacion` |
+| Presupuestos (`/presupuestos`) · Prorrateo (`/prorrateo`) | `/api/v1/presupuestos`, `/api/v1/prorrateo` | `expenses.presupuesto`, `prorrateo`, `gasto_distribucion` |
+| Proveedores · Contratos · Recurrentes | `/api/v1/proveedores`, `/contratos`, `/recurrentes` | `expenses.proveedor`, `contrato`, `recurrente` |
+| Catálogos (`/catalogos`) | `/api/v1/catalogos` | `expenses.categoria`, `subcategoria`, `centro_costo`; `org.unidad_negocio` |
+| Estaciones (`/estaciones`) | `/api/v1/estaciones` | `org.empresa`, `org.estacion`, `org.estacion_unidad` |
+| Usuarios y roles (`/usuarios`) | `/api/v1/usuarios` (usuarios, roles, permisos, pantallas, contraseñas) | `iam.usuario`, `rol`, `rol_permiso`, `rol_pantalla`, `usuario_estacion`, `credencial` |
+| Configuración (`/configuracion`) | `/api/v1/configuracion` | `expenses.parametro` (fecha del sistema, periodo, comprobante obligatorio, tope de caja chica, alertas, prorrateo, comisión de tarjeta, merma) y `expenses.nivel_autorizacion` |
 
-Cómo funciona (`src/modulos/prototipo`, el código de `Expenses_project/src` con las mismas rutas de archivo):
+Cómo está hecha cada una (`src/modulos/<pantalla>/`, con el módulo de Gastos como modelo):
 
-- **Mismas reglas:** cada acción (desembolso, liquidación, requerimiento, cotización, orden, contrato, presupuesto,
-  prorrateo…) pasa por `lib/acciones.ts`, con los mismos permisos, validaciones y bitácora del prototipo.
-- **Datos en este navegador, en cero:** la primera vez se cargan solo los catálogos (`data/seed.ts` y `data/*.json`,
-  en un archivo aparte que no pesa en las demás pantallas):
-  - empresa, PCONC y Oficina central, unidades, centros de costo, roles, usuarios, categorías, proveedores reales y
-    parámetros;
-  - el fondo de caja chica de PCONC (Q3,000, a cargo de `maria.lopez`), porque el fondo no se crea desde las
-    pantallas.
-
-  No hay gastos, ventas, presupuestos, compras, contratos, recurrentes, hallazgos ni bitácora: se registran en las
-  pantallas. La fecha del sistema es la de la PC el día de la primera carga y se cambia en *Configuración*. Los
-  cambios quedan en el `localStorage` del navegador y se ven en las otras pestañas. *Configuración → Restablecer datos*
-  vuelve a cero, solo en este navegador. Lo guardado por versiones anteriores, con la demostración de octubre, se
-  descarta solo (`ESQUEMA` 2 en `lib/local.ts`).
-- **La sesión manda:** no hay otro inicio de sesión. El usuario simulado es el de la sesión real, con el mismo nombre
-  de usuario, y toma del backend su rol, permisos, pantallas, estaciones, límite y alcance.
-- **Mismo filtro de estación:** el del encabezado del ERP, traducido por código (PCONC, OFC…).
-- **Marca discreta:** un ícono gris junto al título explica en su tooltip que la pantalla usa datos simulados.
-  En *Usuarios y roles*, un aviso aclara que ahí no se cambia el acceso real.
-- **Gastos simulados:** los enlaces del Tablero, Alertas, Compras, Franquicia, Indicadores y Prorrateo abren el gasto en
-  `/gastos/simulados/:id`. Ahí se aprueba, rechaza, paga, adjunta o verifica el comprobante, como en el prototipo. No
-  tiene formulario de edición: el de *Registro de gastos* trabaja con el backend.
-- **Componentes:** las pantallas usan los mismos nombres de componentes del prototipo (`components/ui.tsx`), pero
-  dibujados con los del ERP, así que tienen modo oscuro.
-- **Números del menú:** Alertas y Hallazgos muestran sus pendientes, como en el prototipo. Se calculan en un archivo
-  aparte que se carga después de mostrar la página.
-- **Pantallas sin página:** cargar reportes e historial de cargas viven en Integraciones. Inventario y tanques y tomas
-  físicas todavía no tienen página y no se listan en el menú.
-
-Para pasar una pantalla al backend: el esquema ya tiene sus tablas (`expenses.presupuesto`, `caja_chica`,
-`orden_compra`, `contrato`, `recurrente`, `prorrateo`; `audit.evento`, `audit.hallazgo`). Falta exponerlas en la API y
-cambiar en la pantalla `useStore()` por consultas a la API, como en el módulo de Gastos.
+- **`datos.ts`:** consultas y acciones con TanStack Query sobre el cliente tipado (`api`/`pedir`). Los tipos salen del
+  contrato OpenAPI del backend (`npm run api:tipos`), no se declaran a mano.
+- **Las reglas están en el backend:** permisos, validaciones, bitácora y cálculos. La pantalla muestra u oculta con
+  las banderas que trae la respuesta (`puedeEditar`, `acciones.x { ok, motivo }`) y enseña el mensaje del backend.
+- **Dinero exacto:** llega y se envía como texto decimal; los totales y porcentajes los calcula el backend
+  (NUMERIC), nunca el navegador.
+- **Base en cero:** producción arranca solo con catálogos. Cada pantalla se explica sola cuando todavía no hay nada
+  («Todavía no hay…») y todo se registra desde ella (por ejemplo, la caja chica se abre desde su pantalla).
+- **Mismo filtro de estación:** el del encabezado del ERP (`useErp().estacionId`).
+- **Detalle del gasto:** los enlaces del Tablero, Alertas, Compras, Franquicia, Indicadores, Prorrateo y Caja chica
+  abren `/gastos/:id`, donde se aprueba, rechaza, paga, se adjunta la foto o el PDF del comprobante y Contabilidad
+  marca la factura como verificada.
+- **Cargar reportes e historial de cargas** viven en Integraciones.
 
 ## Dashboard de ventas
 
@@ -356,17 +375,19 @@ Diferencias a propósito con el panel:
 | Primera carga desde cero (Integraciones, como `karla.mendez`) | Con el ETL vacío, un reporte de 36 tickets se revisa en 2.4 s y se carga en 2.3 s como carga 1. El ETL vuelve a crear la estación y los productos, y el dashboard pasa de 0 a 36 tickets |
 | Carga real desde Integraciones (Chrome sin interfaz, como `karla.mendez`) | Se suelta un reporte de 36 tickets. El servicio ETL lo revisa en 2.3 s: cuadra, 36 nuevos. Al cargarlo, termina en 2.4 s (carga 9, `ANALYZE` incluido) y la carga aparece en el historial. La API del dashboard cuenta 36 tickets más y `etl.carga` guarda quién lo subió |
 | Servicio ETL apagado | La subida queda en cola y la pantalla lo avisa; al encender el servicio la revisa sola en 4 s |
-| Operación de las pantallas restauradas | Desembolso y liquidación de caja chica (el saldo cambia y el desembolso queda «En reposición»), y los datos siguen ahí al recargar. Requerimiento de compra. Gasto simulado aprobado desde el Tablero. El filtro de estación del encabezado cambia el Tablero y la Caja chica |
+| Pantallas conectadas a la API, en navegador (Chrome sin interfaz, build de producción con `next start`, backend y base propios) | Los 8 usuarios abren todas las pantallas de su menú (119 en total: admin 27, contador 22, gerencia y auditor 21, gerente de estación 15, tesorería 6, caja chica 4, solicitante 3) sin excepciones de JavaScript, sin errores de consola, sin respuestas ≥ 400 de la API y sin `NaN`, `undefined` ni `Infinity`; antes y después de registrar datos |
+| Flujos de escritura por la interfaz (clics y teclado) | Proveedor, categoría con subcategorías y centro de costo; contrato y renovación; plantilla recurrente y su gasto; presupuesto y copia al mes siguiente; prorrateo (aplicar y quitar); caja chica (abrir, desembolsar, liquidar); compra completa (requerimiento, dos cotizaciones, orden, recepción y su gasto); gasto registrado, enviado, aprobado, con PDF adjunto, verificado y pagado; hallazgo a mano, análisis de reportes del ETL y pérdida registrada como gasto; usuario, rol y contraseña; empresa (el encabezado cambia); configuración; cambio de contraseña y de tema |
+| Nada en el almacenamiento del navegador | `localStorage` y `sessionStorage` vacíos para los 8 usuarios después de recorrer todo. El tema queda en la cookie `erp_tema`; un módulo del menú cerrado sigue cerrado al recargar (preferencia en la base) |
+| Base en cero (solo catálogos, como arranca producción) | `admin` (27 pantallas) y `karla.mendez` (15) sin errores: cada pantalla explica su vacío («Todavía no hay…») |
 | Proxy con las rutas nuevas | Sin sesión → renovar o iniciar sesión. Sin la pantalla → su inicio con `?denegado=` (Solicitante en `/tablero`, Tesorería en `/usuarios`, Gerente en `/hallazgos` y `/configuracion`, Auditor en `/usuarios`) |
 
 ## Pendiente
 
-- **Conectar al backend las pantallas con datos simulados:** las tablas ya existen; faltan sus endpoints (ver
-  «Pantallas del prototipo con datos simulados»).
 - **Vista previa de la carga:** las gráficas de la vista previa (por día, por turno, por hora, facturación) siguen
   solo en el panel del ETL (`npm run panel` en `../etl`). La comparación con la base y la tabla ticket por ticket ya
   están en Integraciones.
-- **Comprobantes:** adjuntar archivos y verificarlos; hoy el comprobante es el documento del gasto (FEL o recibo).
+- **Verificación de facturas contra la SAT:** hoy «Verificada» es la revisión que registra Contabilidad en el detalle
+  del gasto (quién y cuándo); no hay consulta automática al portal de la SAT.
 
 El servicio ETL independiente y la prueba de punta a punta están en `../etl`, y el orden para encender todo el ERP, en el
 `README.md` de la raíz.
@@ -384,7 +405,7 @@ El servicio ETL independiente y la prueba de punta a punta están en `../etl`, y
 |---|---|
 | Dockerfile | `Dockerfile` (contexto `.`, etapa `production` o vacía) |
 | Puerto interno | `3000` |
-| Dominio | `https://gasstationerp.belsoftinc.net` (en Dokploy: ese host, puerto `3000`, HTTPS) |
+| Dominio | `https://gasstationconcepcion.belsoftinc.net` (en Dokploy: ese host, puerto `3000`, HTTPS) |
 | Salud | `GET /login` (también es el `HEALTHCHECK` de la imagen) |
 | Ya trae | `NODE_ENV=production`, `PORT=3000`, `HOSTNAME=0.0.0.0`, `TZ=America/Guatemala` |
 

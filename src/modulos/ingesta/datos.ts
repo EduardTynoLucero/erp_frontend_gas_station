@@ -5,7 +5,7 @@
  * pregunta cada 2 segundos; sin nada en curso, cada 30.
  */
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, ErrorApi, type ErrorCampo, irAlInicioDeSesion, pedir, renovarSesion } from '@/api/cliente';
+import { api, ErrorApi, type ErrorCampo, irAlInicioDeSesion, MENSAJE_SIN_CONEXION, pedir, renovarSesion } from '@/api/cliente';
 import type { components, paths, ResumenIngesta, SubidaIngesta } from '@/api/tipos';
 
 export const clavesIngesta = {
@@ -87,7 +87,7 @@ function enviar(archivo: File, url: string, alProgreso: (pct: number) => void): 
     xhr.setRequestHeader('X-Archivo-Nombre', encodeURIComponent(archivo.name));
     xhr.upload.onprogress = (e) => e.lengthComputable && alProgreso(Math.round((e.loaded / e.total) * 100));
     xhr.onload = () => listo(xhr);
-    xhr.onerror = () => falla(new ErrorApi(0, 'SIN_CONEXION', 'No hay conexión con el servidor. Revise que el backend esté encendido (npm run dev en backend/).'));
+    xhr.onerror = () => falla(new ErrorApi(0, 'SIN_CONEXION', MENSAJE_SIN_CONEXION));
     xhr.send(archivo);
   });
 }

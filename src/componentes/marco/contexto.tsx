@@ -1,8 +1,9 @@
 'use client';
 
 /** Contexto del ERP en el navegador: el perfil (de /auth/me, vía el proxy) y el filtro global de estación. */
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useContext, useMemo } from 'react';
 import type { Perfil } from '@/api/tipos';
+import { usePreferencia } from './preferencias';
 
 export const TODAS = 'ALL';
 
@@ -21,20 +22,11 @@ const ContextoErp = createContext<ValorErp | null>(null);
 
 export function ProveedorErp({ perfil, children }: { perfil: Perfil; children: ReactNode }) {
   const estaciones = useMemo(() => perfil.acceso.alcance.estaciones.filter((e) => e.activa), [perfil]);
-  const clave = `erp:estacion:${perfil.usuario.id}`;
-  const [elegida, setElegida] = useState<string>(TODAS);
-
-  // El filtro dura lo que la pestaña (como en el prototipo, vuelve a "Todas" en cada sesión nueva)
-  useEffect(() => {
-    try {
-      const guardada = sessionStorage.getItem(clave);
-      if (guardada) setElegida(guardada);
-    } catch {
-      // almacenamiento no disponible: se queda en "Todas"
-    }
-  }, [clave]);
+  // La estación elegida es una preferencia del usuario, guardada en la base (no en el navegador)
+  const [elegida, fijarEstacionFiltro] = usePreferencia('estacion', TODAS);
 
   const valor = useMemo<ValorErp>(() => {
+    // Si la estación guardada ya no está entre las del usuario (se la quitaron o se desactivó), vuelve a «Todas»
     const valida = elegida === TODAS || estaciones.some((e) => e.id === elegida);
     const estacionFiltro = estaciones.length === 1 ? estaciones[0]!.id : valida ? elegida : TODAS;
     return {
@@ -42,16 +34,9 @@ export function ProveedorErp({ perfil, children }: { perfil: Perfil; children: R
       estaciones,
       estacionFiltro,
       estacionId: estacionFiltro === TODAS ? undefined : estacionFiltro,
-      fijarEstacionFiltro: (id: string) => {
-        setElegida(id);
-        try {
-          sessionStorage.setItem(clave, id);
-        } catch {
-          // sin almacenamiento: el filtro vale hasta recargar
-        }
-      },
+      fijarEstacionFiltro,
     };
-  }, [perfil, estaciones, elegida, clave]);
+  }, [perfil, estaciones, elegida, fijarEstacionFiltro]);
 
   return <ContextoErp.Provider value={valor}>{children}</ContextoErp.Provider>;
 }

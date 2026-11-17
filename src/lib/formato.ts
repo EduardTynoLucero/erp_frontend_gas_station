@@ -1,5 +1,5 @@
 /**
- * Formatos del ERP (port de lib/format.ts del prototipo).
+ * Formatos del ERP (port de lib/format.ts del diseño original).
  * El dinero llega de la API como TEXTO decimal exacto ("7132.73"): se formatea sobre el texto, sin pasar por
  * float, así lo que se muestra es exactamente lo que guarda la base.
  */
@@ -39,7 +39,7 @@ export function redondearTexto(valor: string, dec = 2): string {
   return `${negativo ? '-' : ''}${e}${dec ? `.${texto.slice(corte)}` : ''}`;
 }
 
-/** Q7,132.73 · −Q25.00 (signo menos tipográfico), como q() del prototipo. Acepta texto decimal o número. */
+/** Q7,132.73 · −Q25.00 (signo menos tipográfico), como q() del diseño original. Acepta texto decimal o número. */
 export function q(valor: string | number | null | undefined, simbolo = 'Q', dec = 2): string {
   if (valor === null || valor === undefined || valor === '') return '—';
   const texto = typeof valor === 'number' ? valor.toFixed(dec) : redondearTexto(valor, dec);
@@ -48,7 +48,7 @@ export function q(valor: string | number | null | undefined, simbolo = 'Q', dec 
   return `${negativo ? '−' : ''}${simbolo}${conComas(ent)}${frac ? `.${frac}` : ''}`;
 }
 
-/** Formato compacto para etiquetas: Q1.23M · Q12.4k · Q1,234 (qk del prototipo). */
+/** Formato compacto para etiquetas: Q1.23M · Q12.4k · Q1,234 (qk del diseño original). */
 export function qk(valor: string | number): string {
   const n = typeof valor === 'number' ? valor : Number(valor);
   const a = Math.abs(n);

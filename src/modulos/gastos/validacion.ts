@@ -39,7 +39,7 @@ function decimales(texto: string): number {
   return i < 0 ? 0 : texto.length - i - 1;
 }
 
-/** Valida en el orden en que se muestran los errores (el mismo del prototipo). */
+/** Valida en el orden en que se muestran los errores (el mismo del diseño original). */
 export function validarGasto(v: ValoresGasto, c: Pick<CatalogosGasto, 'monedas' | 'parametros'>): ErroresGasto {
   const e: ErroresGasto = {};
   if (!v.fecha) e.fecha = 'Indique la fecha del gasto.';

@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { mensajeDeError } from '@/api/cliente';
 import { EncabezadoPagina } from '@/componentes/ui/tarjeta';
 import { useTienePantalla } from '@/componentes/marco/contexto';
+import { usePreferencia } from '@/componentes/marco/preferencias';
 import { cn } from '@/lib/utilidades';
 import { BarrasApiladas, Lineas } from '@/modulos/dashboards/componentes/graficas';
 import { Estado } from '@/modulos/dashboards/componentes/iconos';
@@ -25,7 +26,7 @@ import { colorProducto, ordenarProductos, pivotar } from '@/modulos/dashboards/p
 import { Cascada, type Paso } from '../componentes/cascada';
 import { BarraOperacion, type FiltrosFecha } from '../componentes/filtros';
 import { NivelDeTanques } from '../componentes/tanques';
-import { hoy, type Inventario, preferencia, rangoRapido, useInventario, useOpcionesOperacion, useTanques } from '../datos';
+import { hoy, type Inventario, rangoRapido, useInventario, useOpcionesOperacion, useTanques } from '../datos';
 
 type ProductoInv = Inventario['productos'][number];
 type TomaInv = Inventario['tomas'][number];
@@ -418,11 +419,13 @@ export function PantallaInventario() {
   const opciones = useOpcionesOperacion();
   const [filtros, setFiltros] = useState<FiltrosFecha | null>(null);
 
+  // La estación que el usuario dejó elegida (preferencia guardada en la base; la comparten Inventario y Tomas físicas)
+  const [recordada, recordarEstacion] = usePreferencia('operacion:estacion', '');
+
   // Primera vez (y si la estación elegida ya no está): la estación recordada o la primera, y los últimos 7 días con datos
   const o = opciones.data;
   if (o && o.estaciones.length && (!filtros || !o.estaciones.some((e) => e.codigo === filtros.estacion))) {
-    const recordada = preferencia.leer('estacion');
-    const estacion = o.estaciones.some((e) => e.codigo === recordada) ? recordada! : o.estaciones[0]!.codigo;
+    const estacion = o.estaciones.some((e) => e.codigo === recordada) ? recordada : o.estaciones[0]!.codigo;
     setFiltros({ estacion, ...rangoRapido(o.rango.hasta ?? hoy(), '7'), rapido: '7' });
   }
 
@@ -472,7 +475,7 @@ export function PantallaInventario() {
     );
 
   const cambiar = (f: FiltrosFecha) => {
-    preferencia.guardar('estacion', f.estacion);
+    if (f.estacion !== recordada) recordarEstacion(f.estacion);
     setFiltros(f);
   };
   const inv = inventario.data;

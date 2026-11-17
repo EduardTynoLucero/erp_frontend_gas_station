@@ -1,6 +1,7 @@
-/** Datos de la empresa para el encabezado (los mismos de org.empresa en la base). */
-export const EMPRESA = 'Gasolinera Concepción Las Minas, S.A.';
-export const FRANQUICIA = 'Puma Energy';
+/**
+ * Nombre del producto. El nombre de la empresa y su franquicia NO están aquí: vienen de la base (org.empresa) en el
+ * perfil del usuario (perfil.empresa) y se cambian en la pantalla Estaciones.
+ */
 export const NOMBRE_APP = 'ERP Gasolinera';
 
 /**

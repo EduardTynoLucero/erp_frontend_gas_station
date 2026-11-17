@@ -4,7 +4,7 @@
  * La API (/api/v1/*, salvo las rutas propias de Next.js) se reenvía al backend de API_URL. Se hace aquí y no con
  * rewrites de next.config.ts porque esos se fijan al compilar: así API_URL se lee al arrancar el contenedor y la misma
  * imagen sirve para cualquier backend. El navegador sigue hablando solo con Next.js (mismo origen, cookies httpOnly que
- * no salen de este subdominio). En producción: https://gasstationerp.belsoftinc.net/api/v1 →
+ * no salen de este subdominio). En producción: https://gasstationconcepcion.belsoftinc.net/api/v1 →
  * https://backend-gas-station.belsoftinc.net/api/v1, con la IP real del usuario aparte (cabecerasDeReenvio).
  *
  * En cada navegación a una página del ERP:
@@ -19,7 +19,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import type { Perfil } from '@/api/tipos';
 import { cumple, inicioDe, requisitoDe } from '@/lib/rutas';
-import { CABECERA_PERFIL, cabecerasDeReenvio, codificarPerfil, urlApi } from '@/lib/servidor/constantes';
+import { CABECERA_PERFIL, cabecerasDeReenvio, codificarPerfil, URL_PRODUCCION, urlApi } from '@/lib/servidor/constantes';
 
 /** Rutas de /api/v1 que atiende el propio Next.js (src/app/api): no se reenvían al backend. */
 const RUTAS_PROPIAS = new Set(['/api/v1/auth/renovar']);
@@ -42,11 +42,12 @@ function esPublica(pathname: string): boolean {
 
 /**
  * ¿El reenvío volvería a este mismo frontend? Pasa si API_URL tiene la dirección del frontend
- * (https://gasstationerp.belsoftinc.net) en vez de la del backend: cada petición se reenviaría a sí misma sin fin. Se
+ * (https://gasstationconcepcion.belsoftinc.net) en vez de la del backend: cada petición se reenviaría a sí misma sin fin. Se
  * compara con el dominio que pidió el navegador (Host, o X-Forwarded-Host detrás de Traefik).
  */
 function vuelveAEsteFrontend(destino: URL, request: NextRequest): boolean {
-  const propios = [request.headers.get('x-forwarded-host')?.split(',')[0], request.headers.get('host')];
+  // El dominio oficial del frontend también cuenta, aunque la petición haya entrado por otro nombre (la IP, un alias)
+  const propios = [request.headers.get('x-forwarded-host')?.split(',')[0], request.headers.get('host'), new URL(URL_PRODUCCION.frontend).host];
   return propios.some((h) => h?.trim().toLowerCase() === destino.host.toLowerCase());
 }
 

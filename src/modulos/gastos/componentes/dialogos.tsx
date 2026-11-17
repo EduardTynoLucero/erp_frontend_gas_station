@@ -1,6 +1,6 @@
 'use client';
 
-/** Diálogos de acción sobre un gasto (aprobar/rechazar, pagar, eliminar). Textos del prototipo. */
+/** Diálogos de acción sobre un gasto (aprobar/rechazar, pagar, eliminar). Textos del diseño original. */
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ErrorApi, mensajeDeError } from '@/api/cliente';
